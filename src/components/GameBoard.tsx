@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 
-const BOARD_SIZE = 15;
+const BOARD_SIZE = 12;
 const WIN_LENGTH = 5;
 
 type Cell = "X" | "O" | null;
@@ -58,7 +58,7 @@ const GameBoard = () => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-6">
+    <div className="flex flex-col items-center gap-4 sm:gap-6 w-full px-2 sm:px-0">
       {/* Status */}
       <div className="text-center">
         {winner ? (
@@ -87,7 +87,7 @@ const GameBoard = () => {
 
       {/* Board */}
       <div
-        className="grid gap-[1px] bg-primary/30 p-[1px] rounded-lg border border-primary/20"
+        className="grid gap-[1px] bg-primary/30 p-[1px] rounded-lg border border-primary/20 w-full max-w-[540px]"
         style={{ gridTemplateColumns: `repeat(${BOARD_SIZE}, 1fr)`, boxShadow: "var(--neon-glow)" }}
       >
         {board.map((row, ri) =>
@@ -96,7 +96,7 @@ const GameBoard = () => {
               key={`${ri}-${ci}`}
               onClick={() => handleClick(ri, ci)}
               disabled={!!winner || !!cell}
-              className="w-8 h-8 sm:w-9 sm:h-9 bg-card border border-border/50 flex items-center justify-center text-sm sm:text-base font-bold transition-all duration-150 hover:bg-muted hover:border-primary/40 disabled:cursor-default"
+              className="aspect-square w-full bg-card border border-border/50 flex items-center justify-center text-[10px] sm:text-base font-bold transition-all duration-150 hover:bg-muted hover:border-primary/40 disabled:cursor-default"
               style={cell ? {
                 color: cell === "X" ? "hsl(var(--primary))" : "hsl(var(--secondary))",
                 textShadow: cell === "X" ? "var(--neon-glow)" : "var(--neon-glow-secondary)",
