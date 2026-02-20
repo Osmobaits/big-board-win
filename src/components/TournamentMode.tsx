@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Plus, X, Trophy, Save } from "lucide-react";
+import { ArrowLeft, Plus, X, Trophy, Users, Save } from "lucide-react";
 import { Player, TournamentMatch, generateRoundRobinMatches, calculateStandings } from "@/lib/tournament";
 import { saveTournament, clearTournament } from "@/lib/storage";
 import GameBoard, { GameResult } from "./GameBoard";
@@ -8,11 +8,13 @@ interface TournamentModeProps {
   onBack: () => void;
   resumePlayers?: Player[];
   resumeMatches?: TournamentMatch[];
+  minPlayers?: number;
+  maxPlayers?: number;
 }
 
 type TournamentPhase = "setup" | "bracket" | "playing";
 
-const TournamentMode = ({ onBack, resumePlayers, resumeMatches }: TournamentModeProps) => {
+const TournamentMode = ({ onBack, resumePlayers, resumeMatches, minPlayers = 2, maxPlayers }: TournamentModeProps) => {
   const isResuming = !!(resumePlayers && resumeMatches);
   const [phase, setPhase] = useState<TournamentPhase>(isResuming ? "bracket" : "setup");
   const [players, setPlayers] = useState<Player[]>(resumePlayers ?? []);
@@ -31,6 +33,7 @@ const TournamentMode = ({ onBack, resumePlayers, resumeMatches }: TournamentMode
   const addPlayer = () => {
     const name = newName.trim();
     if (!name || players.some((p) => p.name === name)) return;
+    if (maxPlayers && players.length >= maxPlayers) return;
     setPlayers([...players, { id: crypto.randomUUID(), name }]);
     setNewName("");
   };
@@ -96,33 +99,47 @@ const TournamentMode = ({ onBack, resumePlayers, resumeMatches }: TournamentMode
           className="text-2xl font-bold"
           style={{ color: "hsl(var(--secondary))", textShadow: "var(--neon-glow-secondary)" }}
         >
-          <Trophy className="w-6 h-6 inline mr-2" />
-          Turniej
+          {maxPlayers === 2 ? (
+            <>
+              <Users className="w-6 h-6 inline mr-2" />
+              Turniej 1 vs 1
+            </>
+          ) : (
+            <>
+              <Trophy className="w-6 h-6 inline mr-2" />
+              Turniej
+            </>
+          )}
         </h2>
         <p className="text-muted-foreground text-sm text-center">
-          Dodaj graczy (min. 2), każdy zagra z każdym
+          {maxPlayers === 2
+            ? "Podaj imiona dwóch graczy"
+            : `Dodaj graczy (min. ${minPlayers}), każdy zagra z każdym`
+          }
         </p>
 
-        <div className="flex gap-2 w-full">
-          <input
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && addPlayer()}
-            placeholder="Imię gracza"
-            className="flex-1 px-4 py-3 rounded-lg bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-secondary transition-colors"
-          />
-          <button
-            onClick={addPlayer}
-            disabled={!newName.trim()}
-            className="px-4 py-3 rounded-lg transition-colors disabled:opacity-30"
-            style={{
-              backgroundColor: "hsl(var(--secondary))",
-              color: "hsl(var(--secondary-foreground))",
-            }}
-          >
-            <Plus className="w-5 h-5" />
-          </button>
-        </div>
+        {(!maxPlayers || players.length < maxPlayers) && (
+          <div className="flex gap-2 w-full">
+            <input
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && addPlayer()}
+              placeholder="Imię gracza"
+              className="flex-1 px-4 py-3 rounded-lg bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-secondary transition-colors"
+            />
+            <button
+              onClick={addPlayer}
+              disabled={!newName.trim()}
+              className="px-4 py-3 rounded-lg transition-colors disabled:opacity-30"
+              style={{
+                backgroundColor: "hsl(var(--secondary))",
+                color: "hsl(var(--secondary-foreground))",
+              }}
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          </div>
+        )}
 
         <div className="flex flex-col gap-2 w-full">
           {players.map((p, i) => (
@@ -144,7 +161,7 @@ const TournamentMode = ({ onBack, resumePlayers, resumeMatches }: TournamentMode
           ))}
         </div>
 
-        {players.length >= 2 && (
+        {players.length >= minPlayers && (
           <>
             <div className="w-full">
               <label className="text-xs uppercase tracking-wider text-muted-foreground mb-1 block">

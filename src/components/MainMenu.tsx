@@ -1,14 +1,15 @@
-import { Swords, Trophy, Play } from "lucide-react";
+import { Swords, Trophy, Users, Play } from "lucide-react";
 import { hasSavedSingleGame, hasSavedTournament } from "@/lib/storage";
 
 interface MainMenuProps {
   onSingleGame: () => void;
+  onDuel: () => void;
   onTournament: () => void;
   onResumeSingle: () => void;
   onResumeTournament: () => void;
 }
 
-const MainMenu = ({ onSingleGame, onTournament, onResumeSingle, onResumeTournament }: MainMenuProps) => {
+const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResumeTournament }: MainMenuProps) => {
   const hasSingle = hasSavedSingleGame();
   const hasTournament = hasSavedTournament();
 
@@ -76,6 +77,21 @@ const MainMenu = ({ onSingleGame, onTournament, onResumeSingle, onResumeTourname
         </button>
 
         <button
+          onClick={onDuel}
+          className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-lg uppercase tracking-wider transition-all duration-200 hover:scale-[1.02]"
+          style={{
+            backgroundColor: "hsl(var(--secondary) / 0.1)",
+            border: "2px solid hsl(var(--secondary) / 0.4)",
+            color: "hsl(var(--secondary))",
+            textShadow: "var(--neon-glow-secondary)",
+            boxShadow: "var(--neon-glow-secondary)",
+          }}
+        >
+          <Users className="w-6 h-6" />
+          Turniej 1 vs 1
+        </button>
+
+        <button
           onClick={onTournament}
           className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-lg uppercase tracking-wider transition-all duration-200 hover:scale-[1.02]"
           style={{
@@ -87,7 +103,7 @@ const MainMenu = ({ onSingleGame, onTournament, onResumeSingle, onResumeTourname
           }}
         >
           <Trophy className="w-6 h-6" />
-          Turniej
+          Turniej wieloosobowy
         </button>
       </div>
     </div>
