@@ -5,6 +5,7 @@ export interface Player {
 
 export interface TournamentMatch {
   id: string;
+  round: number;
   playerA: Player;
   playerB: Player;
   winner: string | null; // player name
@@ -20,18 +21,23 @@ export interface TournamentStanding {
   points: number;
 }
 
-export const generateRoundRobinMatches = (players: Player[]): TournamentMatch[] => {
+export const generateRoundRobinMatches = (players: Player[], rounds: number = 1): TournamentMatch[] => {
   const matches: TournamentMatch[] = [];
-  for (let i = 0; i < players.length; i++) {
-    for (let j = i + 1; j < players.length; j++) {
-      matches.push({
-        id: `${players[i].id}-vs-${players[j].id}`,
-        playerA: players[i],
-        playerB: players[j],
-        winner: null,
-        isDraw: false,
-        played: false,
-      });
+  for (let round = 0; round < rounds; round++) {
+    for (let i = 0; i < players.length; i++) {
+      for (let j = i + 1; j < players.length; j++) {
+        // Swap A/B on odd rounds so players alternate starting side
+        const isSwapped = round % 2 === 1;
+        matches.push({
+          id: `${players[i].id}-vs-${players[j].id}-r${round}`,
+          round: round + 1,
+          playerA: isSwapped ? players[j] : players[i],
+          playerB: isSwapped ? players[i] : players[j],
+          winner: null,
+          isDraw: false,
+          played: false,
+        });
+      }
     }
   }
   return matches;
