@@ -1,20 +1,31 @@
-import { useState } from "react";
-import { ArrowLeft, Plus, X, Trophy } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowLeft, Plus, X, Trophy, Save } from "lucide-react";
 import { Player, TournamentMatch, generateRoundRobinMatches, calculateStandings } from "@/lib/tournament";
+import { saveTournament, clearTournament } from "@/lib/storage";
 import GameBoard, { GameResult } from "./GameBoard";
 
 interface TournamentModeProps {
   onBack: () => void;
+  resumePlayers?: Player[];
+  resumeMatches?: TournamentMatch[];
 }
 
 type TournamentPhase = "setup" | "bracket" | "playing";
 
-const TournamentMode = ({ onBack }: TournamentModeProps) => {
-  const [phase, setPhase] = useState<TournamentPhase>("setup");
-  const [players, setPlayers] = useState<Player[]>([]);
+const TournamentMode = ({ onBack, resumePlayers, resumeMatches }: TournamentModeProps) => {
+  const isResuming = !!(resumePlayers && resumeMatches);
+  const [phase, setPhase] = useState<TournamentPhase>(isResuming ? "bracket" : "setup");
+  const [players, setPlayers] = useState<Player[]>(resumePlayers ?? []);
   const [newName, setNewName] = useState("");
-  const [matches, setMatches] = useState<TournamentMatch[]>([]);
+  const [matches, setMatches] = useState<TournamentMatch[]>(resumeMatches ?? []);
   const [currentMatch, setCurrentMatch] = useState<TournamentMatch | null>(null);
+
+  // Auto-save tournament state whenever matches change
+  useEffect(() => {
+    if (phase !== "setup" && players.length > 0 && matches.length > 0) {
+      saveTournament({ players, matches, savedAt: Date.now() });
+    }
+  }, [matches, players, phase]);
 
   const addPlayer = () => {
     const name = newName.trim();
@@ -54,6 +65,16 @@ const TournamentMode = ({ onBack }: TournamentModeProps) => {
     setPhase("bracket");
   };
 
+  const handleSaveAndExit = () => {
+    saveTournament({ players, matches, savedAt: Date.now() });
+    onBack();
+  };
+
+  const handleEndTournament = () => {
+    clearTournament();
+    onBack();
+  };
+
   // SETUP PHASE
   if (phase === "setup") {
     return (
@@ -76,7 +97,6 @@ const TournamentMode = ({ onBack }: TournamentModeProps) => {
           Dodaj graczy (min. 3), każdy zagra z każdym
         </p>
 
-        {/* Add player input */}
         <div className="flex gap-2 w-full">
           <input
             value={newName}
@@ -98,7 +118,6 @@ const TournamentMode = ({ onBack }: TournamentModeProps) => {
           </button>
         </div>
 
-        {/* Player list */}
         <div className="flex flex-col gap-2 w-full">
           {players.map((p, i) => (
             <div
@@ -145,6 +164,7 @@ const TournamentMode = ({ onBack }: TournamentModeProps) => {
           playerO={currentMatch.playerB.name}
           onGameEnd={handleGameEnd}
           onBack={backToBracket}
+          onExit={backToBracket}
         />
       </div>
     );
@@ -157,13 +177,15 @@ const TournamentMode = ({ onBack }: TournamentModeProps) => {
 
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-2xl px-4">
-      <button
-        onClick={onBack}
-        className="self-start flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Menu
-      </button>
+      <div className="flex justify-between w-full items-center">
+        <button
+          onClick={handleSaveAndExit}
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Zapisz i wyjdź
+        </button>
+      </div>
 
       <h2
         className="text-2xl font-bold"
@@ -189,10 +211,8 @@ const TournamentMode = ({ onBack }: TournamentModeProps) => {
             {standings.map((s, i) => (
               <tr
                 key={s.player.id}
-                className={`border-t border-border ${i === 0 && allPlayed ? "" : ""}`}
-                style={i === 0 && allPlayed ? {
-                  backgroundColor: "hsl(var(--accent) / 0.1)",
-                } : {}}
+                className="border-t border-border"
+                style={i === 0 && allPlayed ? { backgroundColor: "hsl(var(--accent) / 0.1)" } : {}}
               >
                 <td className="px-3 py-2 text-muted-foreground">
                   {i === 0 && allPlayed ? (
@@ -212,7 +232,6 @@ const TournamentMode = ({ onBack }: TournamentModeProps) => {
         </table>
       </div>
 
-      {/* Winner banner */}
       {allPlayed && (
         <div
           className="w-full text-center py-4 rounded-lg font-bold text-xl uppercase tracking-wider animate-pulse"
@@ -227,7 +246,6 @@ const TournamentMode = ({ onBack }: TournamentModeProps) => {
         </div>
       )}
 
-      {/* Match list / bracket */}
       <h3 className="text-lg font-bold text-foreground mt-2">Drzewko meczy</h3>
       <div className="flex flex-col gap-2 w-full">
         {matches.map((m, i) => (
@@ -275,6 +293,21 @@ const TournamentMode = ({ onBack }: TournamentModeProps) => {
           </div>
         ))}
       </div>
+
+      {/* End tournament */}
+      {allPlayed && (
+        <button
+          onClick={handleEndTournament}
+          className="w-full py-3 rounded-lg font-bold uppercase tracking-wider text-sm transition-all mt-2"
+          style={{
+            backgroundColor: "hsl(var(--accent))",
+            color: "hsl(var(--accent-foreground))",
+            boxShadow: "var(--neon-glow-accent)",
+          }}
+        >
+          Zakończ turniej
+        </button>
+      )}
     </div>
   );
 };

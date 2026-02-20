@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
-import { Undo2, Bot } from "lucide-react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { Undo2, Bot, Save } from "lucide-react";
 import { getAIMove } from "@/lib/ai";
 
 const BOARD_SIZE = 12;
@@ -10,18 +10,26 @@ type Move = { row: number; col: number; player: Cell };
 
 export type GameResult = { winner: string | null; isDraw: boolean };
 
+export interface BoardState {
+  board: Cell[][];
+  isXTurn: boolean;
+  history: Move[];
+}
+
 interface GameBoardProps {
   playerX: string;
   playerO: string;
-  isAI?: boolean; // O is AI
+  isAI?: boolean;
+  initialState?: BoardState;
   onGameEnd?: (result: GameResult) => void;
   onBack?: () => void;
+  onSave?: (state: BoardState) => void;
+  onExit?: () => void;
 }
 
 const getWinLine = (board: Cell[][], row: number, col: number, player: Cell): [number, number][] | null => {
   if (!player) return null;
   const directions: [number, number][] = [[0, 1], [1, 0], [1, 1], [1, -1]];
-
   for (const [dr, dc] of directions) {
     const cells: [number, number][] = [[row, col]];
     for (let i = 1; i < WIN_LENGTH; i++) {
@@ -39,14 +47,14 @@ const getWinLine = (board: Cell[][], row: number, col: number, player: Cell): [n
   return null;
 };
 
-const GameBoard = ({ playerX, playerO, isAI = false, onGameEnd, onBack }: GameBoardProps) => {
+const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, onBack, onSave, onExit }: GameBoardProps) => {
   const [board, setBoard] = useState<Cell[][]>(() =>
-    Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null))
+    initialState?.board ?? Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null))
   );
-  const [isXTurn, setIsXTurn] = useState(true);
+  const [isXTurn, setIsXTurn] = useState(initialState?.isXTurn ?? true);
   const [winner, setWinner] = useState<Cell>(null);
   const [isDraw, setIsDraw] = useState(false);
-  const [history, setHistory] = useState<Move[]>([]);
+  const [history, setHistory] = useState<Move[]>(initialState?.history ?? []);
   const [winLine, setWinLine] = useState<Set<string>>(new Set());
   const [gameEnded, setGameEnded] = useState(false);
   const [aiThinking, setAiThinking] = useState(false);
@@ -60,7 +68,6 @@ const GameBoard = ({ playerX, playerO, isAI = false, onGameEnd, onBack }: GameBo
     newBoard[row][col] = player;
     setBoard(newBoard);
     setHistory((prev) => [...prev, { row, col, player }]);
-
     const line = getWinLine(newBoard, row, col, player);
     if (line) {
       setWinner(player);
@@ -75,30 +82,26 @@ const GameBoard = ({ playerX, playerO, isAI = false, onGameEnd, onBack }: GameBo
 
   const handleClick = useCallback((row: number, col: number) => {
     if (board[row][col] || winner || aiThinking) return;
-    if (isAI && !isXTurn) return; // block clicks during AI turn
+    if (isAI && !isXTurn) return;
     placeMove(row, col, board, isXTurn);
   }, [board, isXTurn, winner, aiThinking, isAI, placeMove]);
 
-  // AI move effect
   useEffect(() => {
     if (!isAI || isXTurn || winner || isDraw || aiThinking) return;
-    
     setAiThinking(true);
     const timeout = setTimeout(() => {
       const boardCopy = board.map((r) => [...r]);
       const [ar, ac] = getAIMove(boardCopy, "O");
       placeMove(ar, ac, board, false);
       setAiThinking(false);
-    }, 400); // small delay for feel
-
+    }, 400);
     return () => clearTimeout(timeout);
   }, [isAI, isXTurn, winner, isDraw, board, aiThinking, placeMove]);
 
   const undo = useCallback(() => {
     if (history.length === 0 || winner) return;
-    let stepsBack = isAI && history.length >= 2 ? 2 : 1; // undo both AI + player move
+    let stepsBack = isAI && history.length >= 2 ? 2 : 1;
     if (isAI && history.length < 2) stepsBack = 1;
-
     const newHistory = [...history];
     const newBoard = board.map((r) => [...r]);
     for (let i = 0; i < stepsBack && newHistory.length > 0; i++) {
@@ -107,10 +110,10 @@ const GameBoard = ({ playerX, playerO, isAI = false, onGameEnd, onBack }: GameBo
     }
     setBoard(newBoard);
     setHistory(newHistory);
-    setIsXTurn(true); // after undo it's always player's turn when playing vs AI
+    setIsXTurn(true);
     if (!isAI && newHistory.length > 0) {
       const last = newHistory[newHistory.length - 1];
-      setIsXTurn(last.player === "O"); // next turn after last move
+      setIsXTurn(last.player === "O");
     } else if (!isAI && newHistory.length === 0) {
       setIsXTurn(true);
     }
@@ -133,6 +136,13 @@ const GameBoard = ({ playerX, playerO, isAI = false, onGameEnd, onBack }: GameBo
       setGameEnded(true);
       onGameEnd?.({ winner: winnerName, isDraw });
     }
+  };
+
+  const handleSaveAndExit = () => {
+    if (!winner && !isDraw && history.length > 0) {
+      onSave?.({ board, isXTurn, history });
+    }
+    onExit?.();
   };
 
   const isWinCell = (ri: number, ci: number) => winLine.has(`${ri}-${ci}`);
@@ -211,25 +221,47 @@ const GameBoard = ({ playerX, playerO, isAI = false, onGameEnd, onBack }: GameBo
       </div>
 
       {/* Controls */}
-      <div className="flex gap-3 flex-wrap justify-center">
+      <div className="flex gap-2 flex-wrap justify-center">
         <button
           onClick={undo}
           disabled={history.length === 0 || !!winner || aiThinking}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted text-foreground font-bold tracking-wider uppercase text-sm hover:bg-border transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted text-foreground font-bold tracking-wider uppercase text-xs hover:bg-border transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <Undo2 className="w-4 h-4" />
           Cofnij
         </button>
         <button
           onClick={reset}
-          className="px-4 py-2 rounded-lg bg-muted text-foreground font-bold tracking-wider uppercase text-sm hover:bg-border transition-colors"
+          className="px-3 py-2 rounded-lg bg-muted text-foreground font-bold tracking-wider uppercase text-xs hover:bg-border transition-colors"
         >
           Od nowa
         </button>
+        {onSave && !winner && !isDraw && history.length > 0 && (
+          <button
+            onClick={handleSaveAndExit}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg font-bold tracking-wider uppercase text-xs transition-colors"
+            style={{
+              backgroundColor: "hsl(var(--accent) / 0.15)",
+              border: "1px solid hsl(var(--accent) / 0.4)",
+              color: "hsl(var(--accent))",
+            }}
+          >
+            <Save className="w-4 h-4" />
+            Zapisz i wyjdź
+          </button>
+        )}
+        {onExit && (winner || isDraw || history.length === 0) && (
+          <button
+            onClick={onExit}
+            className="px-3 py-2 rounded-lg bg-muted text-foreground font-bold tracking-wider uppercase text-xs hover:bg-border transition-colors"
+          >
+            Menu
+          </button>
+        )}
         {(winner || isDraw) && onGameEnd && !gameEnded && (
           <button
             onClick={handleConfirmResult}
-            className="px-4 py-2 rounded-lg font-bold tracking-wider uppercase text-sm transition-colors"
+            className="px-3 py-2 rounded-lg font-bold tracking-wider uppercase text-xs transition-colors"
             style={{
               backgroundColor: "hsl(var(--primary))",
               color: "hsl(var(--primary-foreground))",
@@ -242,7 +274,7 @@ const GameBoard = ({ playerX, playerO, isAI = false, onGameEnd, onBack }: GameBo
         {onBack && gameEnded && (
           <button
             onClick={onBack}
-            className="px-4 py-2 rounded-lg font-bold tracking-wider uppercase text-sm transition-colors"
+            className="px-3 py-2 rounded-lg font-bold tracking-wider uppercase text-xs transition-colors"
             style={{
               backgroundColor: "hsl(var(--accent))",
               color: "hsl(var(--accent-foreground))",

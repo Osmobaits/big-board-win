@@ -1,12 +1,17 @@
-import { useState } from "react";
-import { Swords, Trophy, ArrowLeft } from "lucide-react";
+import { Swords, Trophy, Play } from "lucide-react";
+import { hasSavedSingleGame, hasSavedTournament } from "@/lib/storage";
 
 interface MainMenuProps {
   onSingleGame: () => void;
   onTournament: () => void;
+  onResumeSingle: () => void;
+  onResumeTournament: () => void;
 }
 
-const MainMenu = ({ onSingleGame, onTournament }: MainMenuProps) => {
+const MainMenu = ({ onSingleGame, onTournament, onResumeSingle, onResumeTournament }: MainMenuProps) => {
+  const hasSingle = hasSavedSingleGame();
+  const hasTournament = hasSavedTournament();
+
   return (
     <div className="flex flex-col items-center gap-8 w-full max-w-md px-4">
       <h1
@@ -20,6 +25,41 @@ const MainMenu = ({ onSingleGame, onTournament }: MainMenuProps) => {
       </p>
 
       <div className="flex flex-col gap-4 w-full mt-4">
+        {/* Resume buttons */}
+        {hasSingle && (
+          <button
+            onClick={onResumeSingle}
+            className="flex items-center justify-center gap-3 w-full py-3 rounded-xl font-bold text-base uppercase tracking-wider transition-all duration-200 hover:scale-[1.02]"
+            style={{
+              backgroundColor: "hsl(var(--accent) / 0.1)",
+              border: "2px solid hsl(var(--accent) / 0.4)",
+              color: "hsl(var(--accent))",
+              textShadow: "var(--neon-glow-accent)",
+              boxShadow: "var(--neon-glow-accent)",
+            }}
+          >
+            <Play className="w-5 h-5" />
+            Kontynuuj grę
+          </button>
+        )}
+
+        {hasTournament && (
+          <button
+            onClick={onResumeTournament}
+            className="flex items-center justify-center gap-3 w-full py-3 rounded-xl font-bold text-base uppercase tracking-wider transition-all duration-200 hover:scale-[1.02]"
+            style={{
+              backgroundColor: "hsl(var(--accent) / 0.1)",
+              border: "2px solid hsl(var(--accent) / 0.4)",
+              color: "hsl(var(--accent))",
+              textShadow: "var(--neon-glow-accent)",
+              boxShadow: "var(--neon-glow-accent)",
+            }}
+          >
+            <Play className="w-5 h-5" />
+            Kontynuuj turniej
+          </button>
+        )}
+
         <button
           onClick={onSingleGame}
           className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-lg uppercase tracking-wider transition-all duration-200 hover:scale-[1.02]"
