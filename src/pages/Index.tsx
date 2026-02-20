@@ -2,7 +2,7 @@ import { useState } from "react";
 import MainMenu from "@/components/MainMenu";
 import SingleGame from "@/components/SingleGame";
 import TournamentMode from "@/components/TournamentMode";
-import { loadSingleGame, loadTournament, clearSingleGame } from "@/lib/storage";
+import { loadSingleGame, loadTournament } from "@/lib/storage";
 import bgArcade from "@/assets/bg-arcade.png";
 
 type Screen = "menu" | "single" | "single-resume" | "duel" | "tournament" | "tournament-resume";
@@ -27,7 +27,7 @@ const Index = () => {
       <div className="relative z-10 flex flex-col items-center justify-center gap-8 w-full flex-1">
         {screen === "menu" && (
           <MainMenu
-            onSingleGame={() => { clearSingleGame(); setScreen("single"); }}
+            onSingleGame={() => setScreen("single")}
             onDuel={() => setScreen("duel")}
             onTournament={() => setScreen("tournament")}
             onResumeSingle={() => setScreen("single-resume")}
