@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { Undo2, Bot, Save } from "lucide-react";
 import { getAIMove } from "@/lib/ai";
+import { playPlaceX, playPlaceO, playWin, playDraw } from "@/lib/sounds";
 
 const BOARD_SIZE = 12;
 const WIN_LENGTH = 5;
@@ -69,14 +70,17 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
     const newBoard = currentBoard.map((r) => [...r]);
     const player: Cell = xTurn ? "X" : "O";
     newBoard[row][col] = player;
+    if (player === "X") playPlaceX(); else playPlaceO();
     setBoard(newBoard);
     setHistory((prev) => [...prev, { row, col, player }]);
     const line = getWinLine(newBoard, row, col, player);
     if (line) {
       setWinner(player);
       setWinLine(new Set(line.map(([r, c]) => `${r}-${c}`)));
+      setTimeout(playWin, 150);
     } else if (newBoard.every((r) => r.every((c) => c !== null))) {
       setIsDraw(true);
+      setTimeout(playDraw, 150);
     } else {
       setIsXTurn(!xTurn);
     }
