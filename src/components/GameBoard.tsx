@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 
-const BOARD_SIZE = 10;
+const BOARD_SIZE = 15;
 const WIN_LENGTH = 5;
 
 type Cell = "X" | "O" | null;
@@ -87,8 +87,8 @@ const GameBoard = () => {
 
       {/* Board */}
       <div
-        className="grid gap-[2px] bg-border/30 p-[2px] rounded-lg"
-        style={{ gridTemplateColumns: `repeat(${BOARD_SIZE}, 1fr)` }}
+        className="grid gap-[1px] bg-primary/30 p-[1px] rounded-lg border border-primary/20"
+        style={{ gridTemplateColumns: `repeat(${BOARD_SIZE}, 1fr)`, boxShadow: "var(--neon-glow)" }}
       >
         {board.map((row, ri) =>
           row.map((cell, ci) => (
@@ -96,7 +96,7 @@ const GameBoard = () => {
               key={`${ri}-${ci}`}
               onClick={() => handleClick(ri, ci)}
               disabled={!!winner || !!cell}
-              className="w-10 h-10 sm:w-12 sm:h-12 bg-card rounded-sm flex items-center justify-center text-lg sm:text-xl font-bold transition-all duration-150 hover:bg-muted disabled:cursor-default"
+              className="w-8 h-8 sm:w-9 sm:h-9 bg-card border border-border/50 flex items-center justify-center text-sm sm:text-base font-bold transition-all duration-150 hover:bg-muted hover:border-primary/40 disabled:cursor-default"
               style={cell ? {
                 color: cell === "X" ? "hsl(var(--primary))" : "hsl(var(--secondary))",
                 textShadow: cell === "X" ? "var(--neon-glow)" : "var(--neon-glow-secondary)",
