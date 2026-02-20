@@ -1,16 +1,43 @@
 import { useState } from "react";
 import { ArrowLeft, Bot, Users } from "lucide-react";
-import GameBoard from "./GameBoard";
+import GameBoard, { BoardState } from "./GameBoard";
+import { saveSingleGame, loadSingleGame, clearSingleGame, SavedSingleGame } from "@/lib/storage";
 
 interface SingleGameProps {
   onBack: () => void;
+  resumeData?: SavedSingleGame | null;
 }
 
-const SingleGame = ({ onBack }: SingleGameProps) => {
-  const [playerX, setPlayerX] = useState("");
-  const [playerO, setPlayerO] = useState("");
-  const [vsAI, setVsAI] = useState(false);
-  const [started, setStarted] = useState(false);
+const SingleGame = ({ onBack, resumeData }: SingleGameProps) => {
+  const [playerX, setPlayerX] = useState(resumeData?.playerX ?? "");
+  const [playerO, setPlayerO] = useState(resumeData?.playerO ?? "");
+  const [vsAI, setVsAI] = useState(resumeData?.isAI ?? false);
+  const [started, setStarted] = useState(!!resumeData);
+  const [initialState] = useState<BoardState | undefined>(
+    resumeData
+      ? {
+          board: resumeData.board as any,
+          isXTurn: resumeData.isXTurn,
+          history: resumeData.history as any,
+        }
+      : undefined
+  );
+
+  const handleSave = (state: BoardState) => {
+    saveSingleGame({
+      playerX: playerX.trim() || resumeData?.playerX || "",
+      playerO: vsAI ? "AI" : (playerO.trim() || resumeData?.playerO || ""),
+      isAI: vsAI,
+      board: state.board,
+      isXTurn: state.isXTurn,
+      history: state.history,
+      savedAt: Date.now(),
+    });
+  };
+
+  const handleExit = () => {
+    onBack();
+  };
 
   if (!started) {
     return (
@@ -26,7 +53,6 @@ const SingleGame = ({ onBack }: SingleGameProps) => {
           Pojedyncza gra
         </h2>
 
-        {/* Mode toggle */}
         <div className="flex gap-2 w-full">
           <button
             onClick={() => setVsAI(false)}
@@ -78,7 +104,7 @@ const SingleGame = ({ onBack }: SingleGameProps) => {
             </div>
           )}
           <button
-            onClick={() => setStarted(true)}
+            onClick={() => { clearSingleGame(); setStarted(true); }}
             disabled={!playerX.trim() || (!vsAI && !playerO.trim())}
             className="w-full py-3 rounded-lg font-bold uppercase tracking-wider text-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             style={{
@@ -96,17 +122,13 @@ const SingleGame = ({ onBack }: SingleGameProps) => {
 
   return (
     <div className="flex flex-col items-center gap-4 w-full">
-      <button
-        onClick={onBack}
-        className="self-start ml-4 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Menu
-      </button>
       <GameBoard
-        playerX={playerX.trim()}
-        playerO={vsAI ? "AI" : playerO.trim()}
+        playerX={playerX.trim() || resumeData?.playerX || "X"}
+        playerO={vsAI ? "AI" : (playerO.trim() || resumeData?.playerO || "O")}
         isAI={vsAI}
+        initialState={initialState}
+        onSave={handleSave}
+        onExit={handleExit}
       />
     </div>
   );
