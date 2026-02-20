@@ -1,6 +1,7 @@
 import { Swords, Trophy, Users, Play } from "lucide-react";
 import { motion } from "framer-motion";
 import { hasSavedSingleGame, hasSavedTournament } from "@/lib/storage";
+import logoArcade from "@/assets/logo-arcade.png";
 
 interface MainMenuProps {
   onSingleGame: () => void;
@@ -16,20 +17,15 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
 
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-md px-4">
-      <motion.h1
+      <motion.img
+        src={logoArcade}
+        alt="Five Strike"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 200, damping: 12 }}
-        className="text-2xl sm:text-3xl font-black tracking-wide text-center leading-relaxed"
-        style={{
-          fontFamily: "'Press Start 2P', cursive",
-          color: "hsl(var(--primary))",
-          textShadow: "var(--neon-glow), 0 0 40px hsl(var(--primary) / 0.3)",
-        }}
-      >
-        <span style={{ color: "hsl(var(--secondary))", textShadow: "var(--neon-glow-secondary)" }}>5</span>{" "}
-        w rzędzie
-      </motion.h1>
+        className="w-64 sm:w-80 h-auto"
+        style={{ filter: "drop-shadow(0 0 20px hsl(var(--primary) / 0.5))" }}
+      />
       <p className="text-muted-foreground text-xs tracking-widest text-center uppercase" style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "0.6rem" }}>
         Plansza 12×12 · Wygrywa 5 w linii
       </p>
