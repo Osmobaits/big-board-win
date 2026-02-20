@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Undo2, Bot, Save, Handshake } from "lucide-react";
 import { getAIMove } from "@/lib/ai";
 import { playPlaceX, playPlaceO, playWin, playDraw } from "@/lib/sounds";
@@ -177,16 +178,28 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
       {/* Status */}
       <div className="text-center">
         {winner ? (
-          <h2 className="text-2xl sm:text-3xl font-bold animate-pulse" style={{
-            color: winner === "X" ? "hsl(var(--primary))" : "hsl(var(--secondary))",
-            textShadow: winner === "X" ? "var(--neon-glow)" : "var(--neon-glow-secondary)",
-          }}>
+          <motion.h2
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            className="text-2xl sm:text-3xl font-bold"
+            style={{
+              color: winner === "X" ? "hsl(var(--primary))" : "hsl(var(--secondary))",
+              textShadow: winner === "X" ? "var(--neon-glow)" : "var(--neon-glow-secondary)",
+            }}
+          >
             {winnerName} wygrywa!
-          </h2>
+          </motion.h2>
         ) : isDraw ? (
-          <h2 className="text-2xl sm:text-3xl font-bold text-accent" style={{ textShadow: "var(--neon-glow-accent)" }}>
+          <motion.h2
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            className="text-2xl sm:text-3xl font-bold text-accent"
+            style={{ textShadow: "var(--neon-glow-accent)" }}
+          >
             Remis!
-          </h2>
+          </motion.h2>
         ) : aiThinking ? (
           <h2 className="text-xl sm:text-2xl font-bold text-secondary animate-pulse" style={{ textShadow: "var(--neon-glow-secondary)" }}>
             AI myśli...
@@ -228,7 +241,21 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
                   } : {}),
                 } : {}}
               >
-                {cell}
+                <AnimatePresence>
+                  {cell && (
+                    <motion.span
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={isWin
+                        ? { scale: [0, 1.3, 1], opacity: 1 }
+                        : { scale: [0, 1.2, 1], opacity: 1 }
+                      }
+                      transition={{ duration: isWin ? 0.4 : 0.2, ease: "easeOut" }}
+                      className="absolute inset-0 flex items-center justify-center"
+                    >
+                      {cell}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </button>
             );
           })
