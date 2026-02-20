@@ -4,7 +4,7 @@ import SingleGame from "@/components/SingleGame";
 import TournamentMode from "@/components/TournamentMode";
 import { loadSingleGame, loadTournament, clearSingleGame } from "@/lib/storage";
 
-type Screen = "menu" | "single" | "single-resume" | "tournament" | "tournament-resume";
+type Screen = "menu" | "single" | "single-resume" | "duel" | "tournament" | "tournament-resume";
 
 const Index = () => {
   const [screen, setScreen] = useState<Screen>("menu");
@@ -17,6 +17,7 @@ const Index = () => {
       {screen === "menu" && (
         <MainMenu
           onSingleGame={() => { clearSingleGame(); setScreen("single"); }}
+          onDuel={() => setScreen("duel")}
           onTournament={() => setScreen("tournament")}
           onResumeSingle={() => setScreen("single-resume")}
           onResumeTournament={() => setScreen("tournament-resume")}
@@ -28,8 +29,11 @@ const Index = () => {
           resumeData={savedSingle}
         />
       )}
+      {screen === "duel" && (
+        <TournamentMode onBack={() => setScreen("menu")} maxPlayers={2} />
+      )}
       {screen === "tournament" && (
-        <TournamentMode onBack={() => setScreen("menu")} />
+        <TournamentMode onBack={() => setScreen("menu")} minPlayers={3} />
       )}
       {screen === "tournament-resume" && savedTournament && (
         <TournamentMode
