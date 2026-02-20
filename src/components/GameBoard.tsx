@@ -95,17 +95,24 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
     placeMove(row, col, board, isXTurn);
   }, [board, isXTurn, winner, aiThinking, isAI, placeMove]);
 
+  const aiThinkingRef = useRef(false);
+
   useEffect(() => {
-    if (!isAI || isXTurn || winner || isDraw || aiThinking) return;
+    if (!isAI || isXTurn || winner || isDraw || aiThinkingRef.current) return;
+    aiThinkingRef.current = true;
     setAiThinking(true);
     const timeout = setTimeout(() => {
       const boardCopy = board.map((r) => [...r]);
       const [ar, ac] = getAIMove(boardCopy, "O");
       placeMove(ar, ac, board, false);
+      aiThinkingRef.current = false;
       setAiThinking(false);
     }, 400);
-    return () => clearTimeout(timeout);
-  }, [isAI, isXTurn, winner, isDraw, board, aiThinking, placeMove]);
+    return () => {
+      clearTimeout(timeout);
+      aiThinkingRef.current = false;
+    };
+  }, [isAI, isXTurn, winner, isDraw, board, placeMove]);
 
   const undo = useCallback(() => {
     if (history.length === 0 || winner) return;
