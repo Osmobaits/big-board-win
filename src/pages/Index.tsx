@@ -6,7 +6,7 @@ const Index = () => {
       <h1 className="text-4xl sm:text-5xl font-black tracking-widest text-primary uppercase" style={{ textShadow: "var(--neon-glow)" }}>
         5 w rzędzie
       </h1>
-      <p className="text-muted-foreground text-sm tracking-wide">Plansza 10×10 · Wygrywa 5 w linii</p>
+      <p className="text-muted-foreground text-sm tracking-wide">Plansza 15×15 · Wygrywa 5 w linii</p>
       <GameBoard />
     </div>
   );
