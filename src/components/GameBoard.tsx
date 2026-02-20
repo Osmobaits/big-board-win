@@ -58,9 +58,12 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
   const [winLine, setWinLine] = useState<Set<string>>(new Set());
   const [gameEnded, setGameEnded] = useState(false);
   const [aiThinking, setAiThinking] = useState(false);
+  const [swapped, setSwapped] = useState(false);
 
-  const currentPlayerName = isXTurn ? playerX : playerO;
-  const winnerName = winner === "X" ? playerX : winner === "O" ? playerO : null;
+  const displayX = swapped ? playerO : playerX;
+  const displayO = swapped ? playerX : playerO;
+  const currentPlayerName = isXTurn ? displayX : displayO;
+  const winnerName = winner === "X" ? displayX : winner === "O" ? displayO : null;
 
   const placeMove = useCallback((row: number, col: number, currentBoard: Cell[][], xTurn: boolean) => {
     const newBoard = currentBoard.map((r) => [...r]);
@@ -129,6 +132,7 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
     setWinLine(new Set());
     setGameEnded(false);
     setAiThinking(false);
+    if (!isAI) setSwapped((s) => !s);
   };
 
   const handleConfirmResult = () => {
@@ -152,10 +156,10 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
       {/* Player labels */}
       <div className="flex justify-between w-full max-w-[540px] text-sm font-bold">
         <span style={{ color: "hsl(var(--primary))", textShadow: "var(--neon-glow)" }}>
-          ✕ {playerX}
+          ✕ {displayX}
         </span>
         <span className="flex items-center gap-1" style={{ color: "hsl(var(--secondary))", textShadow: "var(--neon-glow-secondary)" }}>
-          ○ {playerO} {isAI && <Bot className="w-4 h-4" />}
+          ○ {displayO} {isAI && <Bot className="w-4 h-4" />}
         </span>
       </div>
 
