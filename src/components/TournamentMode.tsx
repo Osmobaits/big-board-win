@@ -44,7 +44,12 @@ const TournamentMode = ({ onBack, resumePlayers, resumeMatches }: TournamentMode
     setPhase("bracket");
   };
 
+  const [swapPlayers, setSwapPlayers] = useState(false);
+
   const playMatch = (match: TournamentMatch) => {
+    // Alternate starting player: even matches = normal, odd = swapped
+    const playedSoFar = matches.filter((m) => m.played).length;
+    setSwapPlayers(playedSoFar % 2 === 1);
     setCurrentMatch(match);
     setPhase("playing");
   };
@@ -157,11 +162,13 @@ const TournamentMode = ({ onBack, resumePlayers, resumeMatches }: TournamentMode
 
   // PLAYING PHASE
   if (phase === "playing" && currentMatch) {
+    const pX = swapPlayers ? currentMatch.playerB.name : currentMatch.playerA.name;
+    const pO = swapPlayers ? currentMatch.playerA.name : currentMatch.playerB.name;
     return (
       <div className="flex flex-col items-center gap-4 w-full">
         <GameBoard
-          playerX={currentMatch.playerA.name}
-          playerO={currentMatch.playerB.name}
+          playerX={pX}
+          playerO={pO}
           onGameEnd={handleGameEnd}
           onBack={backToBracket}
           onExit={backToBracket}
