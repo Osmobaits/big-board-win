@@ -17,6 +17,7 @@ const TournamentMode = ({ onBack, resumePlayers, resumeMatches }: TournamentMode
   const [phase, setPhase] = useState<TournamentPhase>(isResuming ? "bracket" : "setup");
   const [players, setPlayers] = useState<Player[]>(resumePlayers ?? []);
   const [newName, setNewName] = useState("");
+  const [rounds, setRounds] = useState(1);
   const [matches, setMatches] = useState<TournamentMatch[]>(resumeMatches ?? []);
   const [currentMatch, setCurrentMatch] = useState<TournamentMatch | null>(null);
 
@@ -39,7 +40,7 @@ const TournamentMode = ({ onBack, resumePlayers, resumeMatches }: TournamentMode
   };
 
   const startTournament = () => {
-    const generated = generateRoundRobinMatches(players);
+    const generated = generateRoundRobinMatches(players, rounds);
     setMatches(generated);
     setPhase("bracket");
   };
@@ -99,7 +100,7 @@ const TournamentMode = ({ onBack, resumePlayers, resumeMatches }: TournamentMode
           Turniej
         </h2>
         <p className="text-muted-foreground text-sm text-center">
-          Dodaj graczy (min. 3), każdy zagra z każdym
+          Dodaj graczy (min. 2), każdy zagra z każdym
         </p>
 
         <div className="flex gap-2 w-full">
@@ -143,18 +144,41 @@ const TournamentMode = ({ onBack, resumePlayers, resumeMatches }: TournamentMode
           ))}
         </div>
 
-        {players.length >= 3 && (
-          <button
-            onClick={startTournament}
-            className="w-full py-3 rounded-lg font-bold uppercase tracking-wider text-sm transition-all"
-            style={{
-              backgroundColor: "hsl(var(--secondary))",
-              color: "hsl(var(--secondary-foreground))",
-              boxShadow: "var(--neon-glow-secondary)",
-            }}
-          >
-            Rozpocznij turniej ({(players.length * (players.length - 1)) / 2} meczy)
-          </button>
+        {players.length >= 2 && (
+          <>
+            <div className="w-full">
+              <label className="text-xs uppercase tracking-wider text-muted-foreground mb-1 block">
+                Liczba rund
+              </label>
+              <div className="flex items-center gap-3">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => setRounds(n)}
+                    className="w-10 h-10 rounded-lg font-bold text-sm transition-all"
+                    style={{
+                      backgroundColor: rounds === n ? "hsl(var(--secondary) / 0.2)" : "hsl(var(--muted))",
+                      border: `2px solid ${rounds === n ? "hsl(var(--secondary) / 0.6)" : "hsl(var(--border))"}`,
+                      color: rounds === n ? "hsl(var(--secondary))" : "hsl(var(--muted-foreground))",
+                    }}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button
+              onClick={startTournament}
+              className="w-full py-3 rounded-lg font-bold uppercase tracking-wider text-sm transition-all"
+              style={{
+                backgroundColor: "hsl(var(--secondary))",
+                color: "hsl(var(--secondary-foreground))",
+                boxShadow: "var(--neon-glow-secondary)",
+              }}
+            >
+              Rozpocznij turniej ({(players.length * (players.length - 1)) / 2 * rounds} meczy)
+            </button>
+          </>
         )}
       </div>
     );
@@ -255,50 +279,65 @@ const TournamentMode = ({ onBack, resumePlayers, resumeMatches }: TournamentMode
 
       <h3 className="text-lg font-bold text-foreground mt-2">Drzewko meczy</h3>
       <div className="flex flex-col gap-2 w-full">
-        {matches.map((m, i) => (
-          <div
-            key={m.id}
-            className="flex items-center justify-between px-4 py-3 rounded-lg border transition-all"
-            style={{
-              borderColor: m.played ? "hsl(var(--border))" : "hsl(var(--primary) / 0.3)",
-              backgroundColor: m.played ? "hsl(var(--card))" : "hsl(var(--primary) / 0.03)",
-            }}
-          >
-            <div className="flex items-center gap-2 text-sm flex-1 min-w-0">
-              <span className="text-muted-foreground text-xs w-6">{i + 1}.</span>
-              <span
-                className={`font-bold truncate ${m.played && m.winner === m.playerA.name ? "text-primary" : ""}`}
-                style={m.played && m.winner === m.playerA.name ? { textShadow: "var(--neon-glow)" } : {}}
-              >
-                {m.playerA.name}
-              </span>
-              <span className="text-muted-foreground text-xs">vs</span>
-              <span
-                className={`font-bold truncate ${m.played && m.winner === m.playerB.name ? "text-primary" : ""}`}
-                style={m.played && m.winner === m.playerB.name ? { textShadow: "var(--neon-glow)" } : {}}
-              >
-                {m.playerB.name}
-              </span>
-              {m.played && m.isDraw && (
-                <span className="text-xs text-accent ml-1">remis</span>
-              )}
-            </div>
-            {!m.played ? (
-              <button
-                onClick={() => playMatch(m)}
-                className="px-3 py-1 rounded text-xs font-bold uppercase tracking-wider transition-colors shrink-0"
-                style={{
-                  backgroundColor: "hsl(var(--primary))",
-                  color: "hsl(var(--primary-foreground))",
-                }}
-              >
-                Graj
-              </button>
-            ) : (
-              <span className="text-xs text-muted-foreground shrink-0">✓</span>
-            )}
-          </div>
-        ))}
+        {(() => {
+          const totalRounds = Math.max(...matches.map((m) => m.round));
+          const showRoundHeaders = totalRounds > 1;
+          let lastRound = 0;
+          return matches.map((m, i) => {
+            const roundHeader = showRoundHeaders && m.round !== lastRound;
+            lastRound = m.round;
+            return (
+              <div key={m.id}>
+                {roundHeader && (
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground font-bold mt-3 mb-1 px-1">
+                    Runda {m.round}
+                  </div>
+                )}
+                <div
+                  className="flex items-center justify-between px-4 py-3 rounded-lg border transition-all"
+                  style={{
+                    borderColor: m.played ? "hsl(var(--border))" : "hsl(var(--primary) / 0.3)",
+                    backgroundColor: m.played ? "hsl(var(--card))" : "hsl(var(--primary) / 0.03)",
+                  }}
+                >
+                  <div className="flex items-center gap-2 text-sm flex-1 min-w-0">
+                    <span className="text-muted-foreground text-xs w-6">{i + 1}.</span>
+                    <span
+                      className={`font-bold truncate ${m.played && m.winner === m.playerA.name ? "text-primary" : ""}`}
+                      style={m.played && m.winner === m.playerA.name ? { textShadow: "var(--neon-glow)" } : {}}
+                    >
+                      {m.playerA.name}
+                    </span>
+                    <span className="text-muted-foreground text-xs">vs</span>
+                    <span
+                      className={`font-bold truncate ${m.played && m.winner === m.playerB.name ? "text-primary" : ""}`}
+                      style={m.played && m.winner === m.playerB.name ? { textShadow: "var(--neon-glow)" } : {}}
+                    >
+                      {m.playerB.name}
+                    </span>
+                    {m.played && m.isDraw && (
+                      <span className="text-xs text-accent ml-1">remis</span>
+                    )}
+                  </div>
+                  {!m.played ? (
+                    <button
+                      onClick={() => playMatch(m)}
+                      className="px-3 py-1 rounded text-xs font-bold uppercase tracking-wider transition-colors shrink-0"
+                      style={{
+                        backgroundColor: "hsl(var(--primary))",
+                        color: "hsl(var(--primary-foreground))",
+                      }}
+                    >
+                      Graj
+                    </button>
+                  ) : (
+                    <span className="text-xs text-muted-foreground shrink-0">✓</span>
+                  )}
+                </div>
+              </div>
+            );
+          });
+        })()}
       </div>
 
       {/* End tournament */}
