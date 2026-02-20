@@ -1,5 +1,6 @@
-import { useState, useCallback } from "react";
-import { Undo2 } from "lucide-react";
+import { useState, useCallback, useEffect } from "react";
+import { Undo2, Bot } from "lucide-react";
+import { getAIMove } from "@/lib/ai";
 
 const BOARD_SIZE = 12;
 const WIN_LENGTH = 5;
@@ -12,6 +13,7 @@ export type GameResult = { winner: string | null; isDraw: boolean };
 interface GameBoardProps {
   playerX: string;
   playerO: string;
+  isAI?: boolean; // O is AI
   onGameEnd?: (result: GameResult) => void;
   onBack?: () => void;
 }
@@ -37,7 +39,7 @@ const getWinLine = (board: Cell[][], row: number, col: number, player: Cell): [n
   return null;
 };
 
-const GameBoard = ({ playerX, playerO, onGameEnd, onBack }: GameBoardProps) => {
+const GameBoard = ({ playerX, playerO, isAI = false, onGameEnd, onBack }: GameBoardProps) => {
   const [board, setBoard] = useState<Cell[][]>(() =>
     Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null))
   );
@@ -47,14 +49,14 @@ const GameBoard = ({ playerX, playerO, onGameEnd, onBack }: GameBoardProps) => {
   const [history, setHistory] = useState<Move[]>([]);
   const [winLine, setWinLine] = useState<Set<string>>(new Set());
   const [gameEnded, setGameEnded] = useState(false);
+  const [aiThinking, setAiThinking] = useState(false);
 
   const currentPlayerName = isXTurn ? playerX : playerO;
   const winnerName = winner === "X" ? playerX : winner === "O" ? playerO : null;
 
-  const handleClick = useCallback((row: number, col: number) => {
-    if (board[row][col] || winner) return;
-    const newBoard = board.map((r) => [...r]);
-    const player = isXTurn ? "X" : "O";
+  const placeMove = useCallback((row: number, col: number, currentBoard: Cell[][], xTurn: boolean) => {
+    const newBoard = currentBoard.map((r) => [...r]);
+    const player: Cell = xTurn ? "X" : "O";
     newBoard[row][col] = player;
     setBoard(newBoard);
     setHistory((prev) => [...prev, { row, col, player }]);
@@ -66,21 +68,54 @@ const GameBoard = ({ playerX, playerO, onGameEnd, onBack }: GameBoardProps) => {
     } else if (newBoard.every((r) => r.every((c) => c !== null))) {
       setIsDraw(true);
     } else {
-      setIsXTurn(!isXTurn);
+      setIsXTurn(!xTurn);
     }
-  }, [board, isXTurn, winner]);
+    return newBoard;
+  }, []);
+
+  const handleClick = useCallback((row: number, col: number) => {
+    if (board[row][col] || winner || aiThinking) return;
+    if (isAI && !isXTurn) return; // block clicks during AI turn
+    placeMove(row, col, board, isXTurn);
+  }, [board, isXTurn, winner, aiThinking, isAI, placeMove]);
+
+  // AI move effect
+  useEffect(() => {
+    if (!isAI || isXTurn || winner || isDraw || aiThinking) return;
+    
+    setAiThinking(true);
+    const timeout = setTimeout(() => {
+      const boardCopy = board.map((r) => [...r]);
+      const [ar, ac] = getAIMove(boardCopy, "O");
+      placeMove(ar, ac, board, false);
+      setAiThinking(false);
+    }, 400); // small delay for feel
+
+    return () => clearTimeout(timeout);
+  }, [isAI, isXTurn, winner, isDraw, board, aiThinking, placeMove]);
 
   const undo = useCallback(() => {
     if (history.length === 0 || winner) return;
+    let stepsBack = isAI && history.length >= 2 ? 2 : 1; // undo both AI + player move
+    if (isAI && history.length < 2) stepsBack = 1;
+
     const newHistory = [...history];
-    const lastMove = newHistory.pop()!;
     const newBoard = board.map((r) => [...r]);
-    newBoard[lastMove.row][lastMove.col] = null;
+    for (let i = 0; i < stepsBack && newHistory.length > 0; i++) {
+      const lastMove = newHistory.pop()!;
+      newBoard[lastMove.row][lastMove.col] = null;
+    }
     setBoard(newBoard);
     setHistory(newHistory);
-    setIsXTurn(lastMove.player === "X");
+    setIsXTurn(true); // after undo it's always player's turn when playing vs AI
+    if (!isAI && newHistory.length > 0) {
+      const last = newHistory[newHistory.length - 1];
+      setIsXTurn(last.player === "O"); // next turn after last move
+    } else if (!isAI && newHistory.length === 0) {
+      setIsXTurn(true);
+    }
     setIsDraw(false);
-  }, [history, board, winner]);
+  }, [history, board, winner, isAI]);
 
   const reset = () => {
     setBoard(Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null)));
@@ -90,6 +125,7 @@ const GameBoard = ({ playerX, playerO, onGameEnd, onBack }: GameBoardProps) => {
     setHistory([]);
     setWinLine(new Set());
     setGameEnded(false);
+    setAiThinking(false);
   };
 
   const handleConfirmResult = () => {
@@ -108,8 +144,8 @@ const GameBoard = ({ playerX, playerO, onGameEnd, onBack }: GameBoardProps) => {
         <span style={{ color: "hsl(var(--primary))", textShadow: "var(--neon-glow)" }}>
           ✕ {playerX}
         </span>
-        <span style={{ color: "hsl(var(--secondary))", textShadow: "var(--neon-glow-secondary)" }}>
-          ○ {playerO}
+        <span className="flex items-center gap-1" style={{ color: "hsl(var(--secondary))", textShadow: "var(--neon-glow-secondary)" }}>
+          ○ {playerO} {isAI && <Bot className="w-4 h-4" />}
         </span>
       </div>
 
@@ -125,6 +161,10 @@ const GameBoard = ({ playerX, playerO, onGameEnd, onBack }: GameBoardProps) => {
         ) : isDraw ? (
           <h2 className="text-2xl sm:text-3xl font-bold text-accent" style={{ textShadow: "var(--neon-glow-accent)" }}>
             Remis!
+          </h2>
+        ) : aiThinking ? (
+          <h2 className="text-xl sm:text-2xl font-bold text-secondary animate-pulse" style={{ textShadow: "var(--neon-glow-secondary)" }}>
+            AI myśli...
           </h2>
         ) : (
           <h2 className="text-xl sm:text-2xl font-bold">
@@ -151,7 +191,7 @@ const GameBoard = ({ playerX, playerO, onGameEnd, onBack }: GameBoardProps) => {
               <button
                 key={`${ri}-${ci}`}
                 onClick={() => handleClick(ri, ci)}
-                disabled={!!winner || !!cell}
+                disabled={!!winner || !!cell || aiThinking}
                 className={`aspect-square w-full bg-card border border-border/50 flex items-center justify-center text-[10px] sm:text-base font-bold transition-all duration-150 hover:bg-muted hover:border-primary/40 disabled:cursor-default relative ${isWin ? "z-10" : ""}`}
                 style={cell ? {
                   color: cell === "X" ? "hsl(var(--primary))" : "hsl(var(--secondary))",
@@ -174,7 +214,7 @@ const GameBoard = ({ playerX, playerO, onGameEnd, onBack }: GameBoardProps) => {
       <div className="flex gap-3 flex-wrap justify-center">
         <button
           onClick={undo}
-          disabled={history.length === 0 || !!winner}
+          disabled={history.length === 0 || !!winner || aiThinking}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted text-foreground font-bold tracking-wider uppercase text-sm hover:bg-border transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <Undo2 className="w-4 h-4" />
