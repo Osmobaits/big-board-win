@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { Undo2, Bot, Save } from "lucide-react";
+import { Undo2, Bot, Save, Handshake } from "lucide-react";
 import { getAIMove } from "@/lib/ai";
 import { playPlaceX, playPlaceO, playWin, playDraw } from "@/lib/sounds";
 
@@ -146,6 +146,13 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
     }
   };
 
+  const declareDraw = () => {
+    if (!winner && !isDraw && history.length > 0) {
+      setIsDraw(true);
+      setTimeout(playDraw, 150);
+    }
+  };
+
   const handleSaveAndExit = () => {
     if (!winner && !isDraw && history.length > 0) {
       onSave?.({ board, isXTurn, history });
@@ -244,6 +251,21 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
         >
           Od nowa
         </button>
+        {!winner && !isDraw && history.length > 0 && (
+          <button
+            onClick={declareDraw}
+            disabled={aiThinking}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg font-bold tracking-wider uppercase text-xs transition-colors"
+            style={{
+              backgroundColor: "hsl(var(--accent) / 0.15)",
+              border: "1px solid hsl(var(--accent) / 0.4)",
+              color: "hsl(var(--accent))",
+            }}
+          >
+            <Handshake className="w-4 h-4" />
+            Ogłoś remis
+          </button>
+        )}
         {onSave && !winner && !isDraw && history.length > 0 && (
           <button
             onClick={handleSaveAndExit}
