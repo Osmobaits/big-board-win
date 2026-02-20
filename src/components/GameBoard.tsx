@@ -7,6 +7,15 @@ const WIN_LENGTH = 5;
 type Cell = "X" | "O" | null;
 type Move = { row: number; col: number; player: Cell };
 
+export type GameResult = { winner: string | null; isDraw: boolean };
+
+interface GameBoardProps {
+  playerX: string;
+  playerO: string;
+  onGameEnd?: (result: GameResult) => void;
+  onBack?: () => void;
+}
+
 const getWinLine = (board: Cell[][], row: number, col: number, player: Cell): [number, number][] | null => {
   if (!player) return null;
   const directions: [number, number][] = [[0, 1], [1, 0], [1, 1], [1, -1]];
@@ -28,7 +37,7 @@ const getWinLine = (board: Cell[][], row: number, col: number, player: Cell): [n
   return null;
 };
 
-const GameBoard = () => {
+const GameBoard = ({ playerX, playerO, onGameEnd, onBack }: GameBoardProps) => {
   const [board, setBoard] = useState<Cell[][]>(() =>
     Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null))
   );
@@ -37,6 +46,10 @@ const GameBoard = () => {
   const [isDraw, setIsDraw] = useState(false);
   const [history, setHistory] = useState<Move[]>([]);
   const [winLine, setWinLine] = useState<Set<string>>(new Set());
+  const [gameEnded, setGameEnded] = useState(false);
+
+  const currentPlayerName = isXTurn ? playerX : playerO;
+  const winnerName = winner === "X" ? playerX : winner === "O" ? playerO : null;
 
   const handleClick = useCallback((row: number, col: number) => {
     if (board[row][col] || winner) return;
@@ -76,33 +89,51 @@ const GameBoard = () => {
     setIsDraw(false);
     setHistory([]);
     setWinLine(new Set());
+    setGameEnded(false);
+  };
+
+  const handleConfirmResult = () => {
+    if (!gameEnded && (winner || isDraw)) {
+      setGameEnded(true);
+      onGameEnd?.({ winner: winnerName, isDraw });
+    }
   };
 
   const isWinCell = (ri: number, ci: number) => winLine.has(`${ri}-${ci}`);
 
   return (
     <div className="flex flex-col items-center gap-4 sm:gap-6 w-full px-2 sm:px-0">
+      {/* Player labels */}
+      <div className="flex justify-between w-full max-w-[540px] text-sm font-bold">
+        <span style={{ color: "hsl(var(--primary))", textShadow: "var(--neon-glow)" }}>
+          ✕ {playerX}
+        </span>
+        <span style={{ color: "hsl(var(--secondary))", textShadow: "var(--neon-glow-secondary)" }}>
+          ○ {playerO}
+        </span>
+      </div>
+
       {/* Status */}
       <div className="text-center">
         {winner ? (
-          <h2 className="text-3xl font-bold animate-pulse" style={{
+          <h2 className="text-2xl sm:text-3xl font-bold animate-pulse" style={{
             color: winner === "X" ? "hsl(var(--primary))" : "hsl(var(--secondary))",
             textShadow: winner === "X" ? "var(--neon-glow)" : "var(--neon-glow-secondary)",
           }}>
-            {winner} wygrywa!
+            {winnerName} wygrywa!
           </h2>
         ) : isDraw ? (
-          <h2 className="text-3xl font-bold text-accent" style={{ textShadow: "var(--neon-glow-accent)" }}>
+          <h2 className="text-2xl sm:text-3xl font-bold text-accent" style={{ textShadow: "var(--neon-glow-accent)" }}>
             Remis!
           </h2>
         ) : (
-          <h2 className="text-2xl font-bold">
+          <h2 className="text-xl sm:text-2xl font-bold">
             Ruch:{" "}
             <span style={{
               color: isXTurn ? "hsl(var(--primary))" : "hsl(var(--secondary))",
               textShadow: isXTurn ? "var(--neon-glow)" : "var(--neon-glow-secondary)",
             }}>
-              {isXTurn ? "X" : "O"}
+              {currentPlayerName}
             </span>
           </h2>
         )}
@@ -140,7 +171,7 @@ const GameBoard = () => {
       </div>
 
       {/* Controls */}
-      <div className="flex gap-3">
+      <div className="flex gap-3 flex-wrap justify-center">
         <button
           onClick={undo}
           disabled={history.length === 0 || !!winner}
@@ -151,10 +182,36 @@ const GameBoard = () => {
         </button>
         <button
           onClick={reset}
-          className="px-6 py-2 rounded-lg bg-muted text-foreground font-bold tracking-wider uppercase text-sm hover:bg-border transition-colors"
+          className="px-4 py-2 rounded-lg bg-muted text-foreground font-bold tracking-wider uppercase text-sm hover:bg-border transition-colors"
         >
-          Nowa gra
+          Od nowa
         </button>
+        {(winner || isDraw) && onGameEnd && !gameEnded && (
+          <button
+            onClick={handleConfirmResult}
+            className="px-4 py-2 rounded-lg font-bold tracking-wider uppercase text-sm transition-colors"
+            style={{
+              backgroundColor: "hsl(var(--primary))",
+              color: "hsl(var(--primary-foreground))",
+              boxShadow: "var(--neon-glow)",
+            }}
+          >
+            Zatwierdź wynik
+          </button>
+        )}
+        {onBack && gameEnded && (
+          <button
+            onClick={onBack}
+            className="px-4 py-2 rounded-lg font-bold tracking-wider uppercase text-sm transition-colors"
+            style={{
+              backgroundColor: "hsl(var(--accent))",
+              color: "hsl(var(--accent-foreground))",
+              boxShadow: "var(--neon-glow-accent)",
+            }}
+          >
+            Wróć do turnieju
+          </button>
+        )}
       </div>
     </div>
   );
