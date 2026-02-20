@@ -36,6 +36,7 @@ const SingleGame = ({ onBack, resumeData }: SingleGameProps) => {
   };
 
   const handleExit = () => {
+    // Auto-save is handled by GameBoard calling onSave before onExit
     onBack();
   };
 

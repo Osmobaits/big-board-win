@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Undo2, Bot, Save, Handshake } from "lucide-react";
+import { Undo2, Bot, Handshake } from "lucide-react";
 import { getAIMove } from "@/lib/ai";
 import { playPlaceX, playPlaceO, playWin, playDraw } from "@/lib/sounds";
 import winTrophy from "@/assets/win-trophy.png";
@@ -305,23 +305,14 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
             Ogłoś remis
           </button>
         )}
-        {onSave && !winner && !isDraw && history.length > 0 && (
+        {onExit && (
           <button
-            onClick={handleSaveAndExit}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg font-bold tracking-wider uppercase text-xs transition-colors"
-            style={{
-              backgroundColor: "hsl(var(--accent) / 0.15)",
-              border: "1px solid hsl(var(--accent) / 0.4)",
-              color: "hsl(var(--accent))",
+            onClick={() => {
+              if (onSave && history.length > 0 && !winner && !isDraw) {
+                onSave({ board, isXTurn, history });
+              }
+              onExit();
             }}
-          >
-            <Save className="w-4 h-4" />
-            Zapisz i wyjdź
-          </button>
-        )}
-        {onExit && (winner || isDraw || history.length === 0) && (
-          <button
-            onClick={onExit}
             className="px-3 py-2 rounded-lg bg-muted text-foreground font-bold tracking-wider uppercase text-xs hover:bg-border transition-colors"
           >
             Menu
