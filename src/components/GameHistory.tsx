@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Trash2, Trophy, Handshake, Swords, Users, Bot } from "lucide-react";
+import { ArrowLeft, Trash2, Trophy, Handshake, Swords, Users, Bot, Download, Upload } from "lucide-react";
 import { getGameHistory, clearGameHistory, GameHistoryEntry } from "@/lib/storage";
 
 interface GameHistoryProps {
@@ -32,11 +32,43 @@ const formatDate = (timestamp: number) => {
 const GameHistory = ({ onBack }: GameHistoryProps) => {
   const [history, setHistory] = useState(getGameHistory);
   const [confirmClear, setConfirmClear] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleClear = () => {
     clearGameHistory();
     setHistory([]);
     setConfirmClear(false);
+  };
+
+  const handleExport = () => {
+    const data = JSON.stringify(history, null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `five-strike-historia-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const imported = JSON.parse(ev.target?.result as string) as GameHistoryEntry[];
+        if (!Array.isArray(imported)) return;
+        // Merge: add imported entries that don't already exist (by id)
+        const existingIds = new Set(history.map((g) => g.id));
+        const newEntries = imported.filter((g) => g.id && !existingIds.has(g.id));
+        const merged = [...newEntries, ...history].sort((a, b) => b.date - a.date).slice(0, 100);
+        localStorage.setItem("fiveinarow_history", JSON.stringify(merged));
+        setHistory(merged);
+      } catch { /* ignore invalid files */ }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
   };
 
   // Stats
@@ -157,15 +189,42 @@ const GameHistory = ({ onBack }: GameHistoryProps) => {
           <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
             Historia gier
           </h3>
-          {history.length > 0 && (
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => setConfirmClear(true)}
-              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+              title="Importuj historię z pliku JSON"
             >
-              <Trash2 className="w-3.5 h-3.5" />
-              Wyczyść
+              <Upload className="w-3.5 h-3.5" />
+              Import
             </button>
-          )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleImport}
+              className="hidden"
+            />
+            {history.length > 0 && (
+              <>
+                <button
+                  onClick={handleExport}
+                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+                  title="Eksportuj historię do pliku JSON"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  Eksport
+                </button>
+                <button
+                  onClick={() => setConfirmClear(true)}
+                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Wyczyść
+                </button>
+              </>
+            )}
+          </div>
         </div>
 
         {history.length === 0 ? (
