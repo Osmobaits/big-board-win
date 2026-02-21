@@ -23,7 +23,7 @@ const GameRules = ({ onBack }: GameRulesProps) => {
       <motion.h1
         initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
         className="text-xl sm:text-2xl font-black tracking-wide text-center"
-        style={{ fontFamily: "'Press Start 2P', cursive", color: "hsl(var(--primary))", textShadow: "var(--neon-glow)" }}
+        style={{ fontFamily: "'Cinzel', serif", color: "hsl(var(--primary))", textShadow: "var(--neon-glow)" }}
       >
         {t("rules.title")}
       </motion.h1>
@@ -34,7 +34,7 @@ const GameRules = ({ onBack }: GameRulesProps) => {
             className="flex gap-3 p-3 rounded-lg" style={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }}>
             <rule.icon className="w-5 h-5 mt-0.5 shrink-0" style={{ color: "hsl(var(--primary))" }} />
             <div>
-              <h3 className="font-bold text-xs mb-1" style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "0.55rem", color: "hsl(var(--primary))" }}>
+              <h3 className="font-bold text-sm mb-1" style={{ fontFamily: "'Cinzel', serif", color: "hsl(var(--primary))" }}>
                 {rule.title}
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{rule.desc}</p>
@@ -45,7 +45,7 @@ const GameRules = ({ onBack }: GameRulesProps) => {
 
       <motion.button onClick={onBack} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
         className="flex items-center justify-center gap-3 w-full py-3 rounded font-bold text-sm uppercase tracking-wider transition-colors"
-        style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "0.7rem", backgroundColor: "hsl(var(--muted))", border: "3px solid hsl(var(--border))", color: "hsl(var(--muted-foreground))" }}>
+        style={{ fontFamily: "'Cinzel', serif", backgroundColor: "hsl(var(--muted))", border: "2px solid hsl(var(--border))", color: "hsl(var(--muted-foreground))" }}>
         <ArrowLeft className="w-5 h-5" />
         {t("rules.back")}
       </motion.button>
