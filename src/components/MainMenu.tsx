@@ -1,6 +1,7 @@
-import { Swords, Trophy, Users, Play } from "lucide-react";
+import { useState } from "react";
+import { Swords, Trophy, Users, Play, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { hasSavedSingleGame, hasSavedTournament } from "@/lib/storage";
+import { hasSavedSingleGame, hasSavedTournament, clearSingleGame, clearTournament } from "@/lib/storage";
 import logoArcade from "@/assets/logo-arcade.png";
 
 interface MainMenuProps {
@@ -12,8 +13,8 @@ interface MainMenuProps {
 }
 
 const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResumeTournament }: MainMenuProps) => {
-  const hasSingle = hasSavedSingleGame();
-  const hasTournament = hasSavedTournament();
+  const [hasSingle, setHasSingle] = useState(hasSavedSingleGame());
+  const [hasTournament, setHasTournament] = useState(hasSavedTournament());
 
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-md px-4">
@@ -45,37 +46,65 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
       <div className="flex flex-col gap-4 w-full mt-4">
         {/* Resume buttons */}
         {hasSingle && (
-          <button
-            onClick={onResumeSingle}
-            className="flex items-center justify-center gap-3 w-full py-3 rounded-xl font-bold text-base uppercase tracking-wider transition-all duration-200 hover:scale-[1.02]"
-            style={{
-              backgroundColor: "hsl(var(--accent) / 0.1)",
-              border: "2px solid hsl(var(--accent) / 0.4)",
-              color: "hsl(var(--accent))",
-              textShadow: "var(--neon-glow-accent)",
-              boxShadow: "var(--neon-glow-accent)",
-            }}
-          >
-            <Play className="w-5 h-5" />
-            Kontynuuj grę
-          </button>
+          <div className="flex gap-2 w-full">
+            <button
+              onClick={onResumeSingle}
+              className="flex items-center justify-center gap-3 flex-1 py-3 rounded-xl font-bold text-base uppercase tracking-wider transition-all duration-200 hover:scale-[1.02]"
+              style={{
+                backgroundColor: "hsl(var(--accent) / 0.1)",
+                border: "2px solid hsl(var(--accent) / 0.4)",
+                color: "hsl(var(--accent))",
+                textShadow: "var(--neon-glow-accent)",
+                boxShadow: "var(--neon-glow-accent)",
+              }}
+            >
+              <Play className="w-5 h-5" />
+              Kontynuuj grę
+            </button>
+            <button
+              onClick={() => { clearSingleGame(); setHasSingle(false); }}
+              className="flex items-center justify-center px-3 py-3 rounded-xl font-bold transition-all duration-200 hover:scale-[1.05]"
+              style={{
+                backgroundColor: "hsl(0 60% 50% / 0.15)",
+                border: "2px solid hsl(0 60% 50% / 0.4)",
+                color: "hsl(0 60% 50%)",
+              }}
+              title="Usuń zapisaną grę"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+          </div>
         )}
 
         {hasTournament && (
-          <button
-            onClick={onResumeTournament}
-            className="flex items-center justify-center gap-3 w-full py-3 rounded-xl font-bold text-base uppercase tracking-wider transition-all duration-200 hover:scale-[1.02]"
-            style={{
-              backgroundColor: "hsl(var(--accent) / 0.1)",
-              border: "2px solid hsl(var(--accent) / 0.4)",
-              color: "hsl(var(--accent))",
-              textShadow: "var(--neon-glow-accent)",
-              boxShadow: "var(--neon-glow-accent)",
-            }}
-          >
-            <Play className="w-5 h-5" />
-            Kontynuuj turniej
-          </button>
+          <div className="flex gap-2 w-full">
+            <button
+              onClick={onResumeTournament}
+              className="flex items-center justify-center gap-3 flex-1 py-3 rounded-xl font-bold text-base uppercase tracking-wider transition-all duration-200 hover:scale-[1.02]"
+              style={{
+                backgroundColor: "hsl(var(--accent) / 0.1)",
+                border: "2px solid hsl(var(--accent) / 0.4)",
+                color: "hsl(var(--accent))",
+                textShadow: "var(--neon-glow-accent)",
+                boxShadow: "var(--neon-glow-accent)",
+              }}
+            >
+              <Play className="w-5 h-5" />
+              Kontynuuj turniej
+            </button>
+            <button
+              onClick={() => { clearTournament(); setHasTournament(false); }}
+              className="flex items-center justify-center px-3 py-3 rounded-xl font-bold transition-all duration-200 hover:scale-[1.05]"
+              style={{
+                backgroundColor: "hsl(0 60% 50% / 0.15)",
+                border: "2px solid hsl(0 60% 50% / 0.4)",
+                color: "hsl(0 60% 50%)",
+              }}
+              title="Usuń zapisany turniej"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+          </div>
         )}
 
         <motion.button
