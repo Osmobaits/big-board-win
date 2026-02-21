@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Swords, Trophy, Users, Play, Trash2, BarChart3 } from "lucide-react";
+import { Swords, Trophy, Users, Play, Trash2, BarChart3, BookOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { hasSavedSingleGame, hasSavedTournament, clearSingleGame, clearTournament } from "@/lib/storage";
 import logoArcade from "@/assets/logo-arcade.png";
@@ -11,9 +11,10 @@ interface MainMenuProps {
   onResumeSingle: () => void;
   onResumeTournament: () => void;
   onHistory: () => void;
+  onRules: () => void;
 }
 
-const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResumeTournament, onHistory }: MainMenuProps) => {
+const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResumeTournament, onHistory, onRules }: MainMenuProps) => {
   const [hasSingle, setHasSingle] = useState(hasSavedSingleGame());
   const [hasTournament, setHasTournament] = useState(hasSavedTournament());
   const [confirmDelete, setConfirmDelete] = useState<"single" | "tournament" | null>(null);
@@ -181,6 +182,23 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
         >
           <BarChart3 className="w-5 h-5" />
           Tablica wyników
+        </motion.button>
+
+        <motion.button
+          onClick={onRules}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.97 }}
+          className="flex items-center justify-center gap-3 w-full py-3 rounded font-bold text-sm uppercase tracking-wider transition-colors"
+          style={{
+            fontFamily: "'Press Start 2P', cursive",
+            fontSize: "0.6rem",
+            backgroundColor: "transparent",
+            border: "2px solid hsl(var(--border))",
+            color: "hsl(var(--muted-foreground))",
+          }}
+        >
+          <BookOpen className="w-4 h-4" />
+          Zasady gry
         </motion.button>
       </div>
 
