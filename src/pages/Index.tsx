@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import MainMenu from "@/components/MainMenu";
 import SingleGame from "@/components/SingleGame";
 import TournamentMode from "@/components/TournamentMode";
@@ -6,6 +7,12 @@ import { loadSingleGame, loadTournament } from "@/lib/storage";
 import bgArcade from "@/assets/bg-arcade.png";
 
 type Screen = "menu" | "single" | "single-resume" | "duel" | "tournament" | "tournament-resume";
+
+const screenVariants = {
+  initial: { opacity: 0, scale: 0.95, y: 20 },
+  animate: { opacity: 1, scale: 1, y: 0 },
+  exit: { opacity: 0, scale: 0.95, y: -20 },
+};
 
 const Index = () => {
   const [screen, setScreen] = useState<Screen>("menu");
@@ -25,34 +32,86 @@ const Index = () => {
       {/* Overlay for readability */}
       <div className="absolute inset-0 bg-background/70" />
       <div className="relative z-10 flex flex-col items-center justify-center gap-8 w-full flex-1">
-        {screen === "menu" && (
-          <MainMenu
-            onSingleGame={() => setScreen("single")}
-            onDuel={() => setScreen("duel")}
-            onTournament={() => setScreen("tournament")}
-            onResumeSingle={() => setScreen("single-resume")}
-            onResumeTournament={() => setScreen("tournament-resume")}
-          />
-        )}
-        {(screen === "single" || screen === "single-resume") && (
-          <SingleGame
-            onBack={() => setScreen("menu")}
-            resumeData={savedSingle}
-          />
-        )}
-        {screen === "duel" && (
-          <TournamentMode onBack={() => setScreen("menu")} maxPlayers={2} />
-        )}
-        {screen === "tournament" && (
-          <TournamentMode onBack={() => setScreen("menu")} minPlayers={3} />
-        )}
-        {screen === "tournament-resume" && savedTournament && (
-          <TournamentMode
-            onBack={() => setScreen("menu")}
-            resumePlayers={savedTournament.players}
-            resumeMatches={savedTournament.matches}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {screen === "menu" && (
+            <motion.div
+              key="menu"
+              variants={screenVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="w-full flex flex-col items-center"
+            >
+              <MainMenu
+                onSingleGame={() => setScreen("single")}
+                onDuel={() => setScreen("duel")}
+                onTournament={() => setScreen("tournament")}
+                onResumeSingle={() => setScreen("single-resume")}
+                onResumeTournament={() => setScreen("tournament-resume")}
+              />
+            </motion.div>
+          )}
+          {(screen === "single" || screen === "single-resume") && (
+            <motion.div
+              key="single"
+              variants={screenVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="w-full flex flex-col items-center"
+            >
+              <SingleGame
+                onBack={() => setScreen("menu")}
+                resumeData={savedSingle}
+              />
+            </motion.div>
+          )}
+          {screen === "duel" && (
+            <motion.div
+              key="duel"
+              variants={screenVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="w-full flex flex-col items-center"
+            >
+              <TournamentMode onBack={() => setScreen("menu")} maxPlayers={2} />
+            </motion.div>
+          )}
+          {screen === "tournament" && (
+            <motion.div
+              key="tournament"
+              variants={screenVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="w-full flex flex-col items-center"
+            >
+              <TournamentMode onBack={() => setScreen("menu")} minPlayers={3} />
+            </motion.div>
+          )}
+          {screen === "tournament-resume" && savedTournament && (
+            <motion.div
+              key="tournament-resume"
+              variants={screenVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="w-full flex flex-col items-center"
+            >
+              <TournamentMode
+                onBack={() => setScreen("menu")}
+                resumePlayers={savedTournament.players}
+                resumeMatches={savedTournament.matches}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
