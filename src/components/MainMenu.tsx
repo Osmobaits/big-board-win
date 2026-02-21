@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Swords, Trophy, Users, Play, Trash2, BarChart3, BookOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { hasSavedSingleGame, hasSavedTournament, clearSingleGame, clearTournament } from "@/lib/storage";
+import { VERSION_STRING } from "@/lib/version";
 import logoArcade from "@/assets/logo-arcade.png";
 
 interface MainMenuProps {
@@ -201,6 +202,10 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
           Zasady gry
         </motion.button>
       </div>
+
+      <p className="text-muted-foreground/50 text-center mt-2" style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "0.45rem" }}>
+        {VERSION_STRING}
+      </p>
 
       {/* Confirmation dialog */}
       <AnimatePresence>
