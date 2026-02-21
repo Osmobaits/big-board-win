@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ArrowLeft, Bot, Users } from "lucide-react";
-import GameBoard, { BoardState } from "./GameBoard";
-import { saveSingleGame, loadSingleGame, clearSingleGame, SavedSingleGame } from "@/lib/storage";
+import GameBoard, { BoardState, GameResult } from "./GameBoard";
+import { saveSingleGame, loadSingleGame, clearSingleGame, SavedSingleGame, addGameToHistory } from "@/lib/storage";
 
 interface SingleGameProps {
   onBack: () => void;
@@ -130,6 +130,18 @@ const SingleGame = ({ onBack, resumeData }: SingleGameProps) => {
         initialState={initialState}
         onSave={handleSave}
         onExit={handleExit}
+        onGameEnd={(result: GameResult) => {
+          const pX = playerX.trim() || resumeData?.playerX || "X";
+          const pO = vsAI ? "AI" : (playerO.trim() || resumeData?.playerO || "O");
+          addGameToHistory({
+            playerX: pX,
+            playerO: pO,
+            winner: result.winner,
+            isDraw: result.isDraw,
+            mode: "single",
+          });
+          clearSingleGame();
+        }}
       />
     </div>
   );

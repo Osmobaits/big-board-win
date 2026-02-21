@@ -3,10 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import MainMenu from "@/components/MainMenu";
 import SingleGame from "@/components/SingleGame";
 import TournamentMode from "@/components/TournamentMode";
+import GameHistory from "@/components/GameHistory";
 import { loadSingleGame, loadTournament } from "@/lib/storage";
 import bgArcade from "@/assets/bg-arcade.png";
 
-type Screen = "menu" | "single" | "single-resume" | "duel" | "tournament" | "tournament-resume";
+type Screen = "menu" | "single" | "single-resume" | "duel" | "tournament" | "tournament-resume" | "history";
 
 const screenVariants = {
   initial: { opacity: 0, scale: 0.95, y: 20 },
@@ -49,6 +50,7 @@ const Index = () => {
                 onTournament={() => setScreen("tournament")}
                 onResumeSingle={() => setScreen("single-resume")}
                 onResumeTournament={() => setScreen("tournament-resume")}
+                onHistory={() => setScreen("history")}
               />
             </motion.div>
           )}
@@ -109,6 +111,19 @@ const Index = () => {
                 resumePlayers={savedTournament.players}
                 resumeMatches={savedTournament.matches}
               />
+            </motion.div>
+          )}
+          {screen === "history" && (
+            <motion.div
+              key="history"
+              variants={screenVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="w-full flex flex-col items-center"
+            >
+              <GameHistory onBack={() => setScreen("menu")} />
             </motion.div>
           )}
         </AnimatePresence>
