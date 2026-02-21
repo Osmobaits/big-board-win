@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Undo2, Bot, Handshake } from "lucide-react";
 import { getAIMove } from "@/lib/ai";
 import { playPlaceX, playPlaceO, playWin, playDraw } from "@/lib/sounds";
+import { t, useLang } from "@/lib/i18n";
 import winTrophy from "@/assets/win-trophy.png";
 
 const BOARD_SIZE = 12;
@@ -51,6 +52,7 @@ const getWinLine = (board: Cell[][], row: number, col: number, player: Cell): [n
 };
 
 const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, onBack, onSave, onExit }: GameBoardProps) => {
+  const [lang] = useLang();
   const [board, setBoard] = useState<Cell[][]>(() =>
     initialState?.board ?? Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null))
   );
@@ -116,10 +118,7 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
       aiThinkingRef.current = false;
       setAiThinking(false);
     }, 400);
-    return () => {
-      clearTimeout(timeout);
-      aiThinkingRef.current = false;
-    };
+    return () => { clearTimeout(timeout); aiThinkingRef.current = false; };
   }, [isAI, isXTurn, winner, isDraw, board, placeMove]);
 
   const undo = useCallback(() => {
@@ -165,7 +164,6 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
     }
   }, [gameEnded, winner, isDraw, winnerName, onGameEnd]);
 
-  // Auto-confirm result in single game mode (no onBack = no tournament)
   useEffect(() => {
     if (autoConfirm && (winner || isDraw) && !gameEnded) {
       handleConfirmResult();
@@ -190,7 +188,6 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
 
   return (
     <div className="flex flex-col items-center gap-4 sm:gap-6 w-full px-2 sm:px-0">
-      {/* Player labels */}
       <div className="flex justify-between w-full max-w-[540px] text-sm font-bold">
         <span style={{ color: "hsl(var(--primary))", textShadow: "var(--neon-glow)" }}>
           ✕ {displayX}
@@ -200,60 +197,32 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
         </span>
       </div>
 
-      {/* Status */}
       <div className="text-center">
         {winner ? (
-          <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 15 }}
-            className="flex flex-col items-center gap-2"
-          >
-            <motion.img
-              src={winTrophy}
-              alt="Winner!"
-              className="w-16 h-16 sm:w-20 sm:h-20"
-              animate={{ rotate: [0, -5, 5, -5, 0] }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            />
-            <h2
-              className="text-lg sm:text-2xl font-bold"
-              style={{
-                color: winner === "X" ? "hsl(var(--primary))" : "hsl(var(--secondary))",
-                textShadow: winner === "X" ? "var(--neon-glow)" : "var(--neon-glow-secondary)",
-              }}
-            >
-              {winnerName} wygrywa!
+          <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 300, damping: 15 }} className="flex flex-col items-center gap-2">
+            <motion.img src={winTrophy} alt="Winner!" className="w-16 h-16 sm:w-20 sm:h-20" animate={{ rotate: [0, -5, 5, -5, 0] }} transition={{ duration: 0.5, delay: 0.3 }} />
+            <h2 className="text-lg sm:text-2xl font-bold" style={{ color: winner === "X" ? "hsl(var(--primary))" : "hsl(var(--secondary))", textShadow: winner === "X" ? "var(--neon-glow)" : "var(--neon-glow-secondary)" }}>
+              {winnerName} {t("game.wins")}
             </h2>
           </motion.div>
         ) : isDraw ? (
-          <motion.h2
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 15 }}
-            className="text-2xl sm:text-3xl font-bold text-accent"
-            style={{ textShadow: "var(--neon-glow-accent)" }}
-          >
-            Remis!
+          <motion.h2 initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 300, damping: 15 }} className="text-2xl sm:text-3xl font-bold text-accent" style={{ textShadow: "var(--neon-glow-accent)" }}>
+            {t("game.draw")}
           </motion.h2>
         ) : aiThinking ? (
           <h2 className="text-xl sm:text-2xl font-bold text-secondary animate-pulse" style={{ textShadow: "var(--neon-glow-secondary)" }}>
-            AI myśli...
+            {t("game.aiThinking")}
           </h2>
         ) : (
           <h2 className="text-xl sm:text-2xl font-bold">
-            Ruch:{" "}
-            <span style={{
-              color: isXTurn ? "hsl(var(--primary))" : "hsl(var(--secondary))",
-              textShadow: isXTurn ? "var(--neon-glow)" : "var(--neon-glow-secondary)",
-            }}>
+            {t("game.turn")}{" "}
+            <span style={{ color: isXTurn ? "hsl(var(--primary))" : "hsl(var(--secondary))", textShadow: isXTurn ? "var(--neon-glow)" : "var(--neon-glow-secondary)" }}>
               {currentPlayerName}
             </span>
           </h2>
         )}
       </div>
 
-      {/* Board */}
       <div
         className="grid gap-[1px] bg-primary/30 p-[1px] rounded-lg border border-primary/20 w-full max-w-[540px]"
         style={{ gridTemplateColumns: `repeat(${BOARD_SIZE}, 1fr)`, boxShadow: "var(--neon-glow)" }}
@@ -281,10 +250,7 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
                   {cell && (
                     <motion.span
                       initial={{ scale: 0, opacity: 0 }}
-                      animate={isWin
-                        ? { scale: [0, 1.3, 1], opacity: 1 }
-                        : { scale: [0, 1.2, 1], opacity: 1 }
-                      }
+                      animate={isWin ? { scale: [0, 1.3, 1], opacity: 1 } : { scale: [0, 1.2, 1], opacity: 1 }}
                       transition={{ duration: isWin ? 0.4 : 0.2, ease: "easeOut" }}
                       className="absolute inset-0 flex items-center justify-center"
                     >
@@ -298,74 +264,39 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
         )}
       </div>
 
-      {/* Controls */}
       <div className="flex gap-2 flex-wrap justify-center">
-        <button
-          onClick={undo}
-          disabled={history.length === 0 || !!winner || aiThinking}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted text-foreground font-bold tracking-wider uppercase text-xs hover:bg-border transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          <Undo2 className="w-4 h-4" />
-          Cofnij
+        <button onClick={undo} disabled={history.length === 0 || !!winner || aiThinking}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted text-foreground font-bold tracking-wider uppercase text-xs hover:bg-border transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+          <Undo2 className="w-4 h-4" /> {t("game.undo")}
         </button>
-        <button
-          onClick={reset}
-          className="px-3 py-2 rounded-lg bg-muted text-foreground font-bold tracking-wider uppercase text-xs hover:bg-border transition-colors"
-        >
-          Od nowa
+        <button onClick={reset} className="px-3 py-2 rounded-lg bg-muted text-foreground font-bold tracking-wider uppercase text-xs hover:bg-border transition-colors">
+          {t("game.restart")}
         </button>
         {!winner && !isDraw && history.length > 0 && (
-          <button
-            onClick={declareDraw}
-            disabled={aiThinking}
+          <button onClick={declareDraw} disabled={aiThinking}
             className="flex items-center gap-2 px-3 py-2 rounded-lg font-bold tracking-wider uppercase text-xs transition-colors"
-            style={{
-              backgroundColor: "hsl(var(--accent) / 0.15)",
-              border: "1px solid hsl(var(--accent) / 0.4)",
-              color: "hsl(var(--accent))",
-            }}
-          >
-            <Handshake className="w-4 h-4" />
-            Ogłoś remis
+            style={{ backgroundColor: "hsl(var(--accent) / 0.15)", border: "1px solid hsl(var(--accent) / 0.4)", color: "hsl(var(--accent))" }}>
+            <Handshake className="w-4 h-4" /> {t("game.declareDraw")}
           </button>
         )}
         {onExit && (
-          <button
-            onClick={() => {
-              if (onSave && history.length > 0 && !winner && !isDraw) {
-                onSave({ board, isXTurn, history });
-              }
-              onExit();
-            }}
-            className="px-3 py-2 rounded-lg bg-muted text-foreground font-bold tracking-wider uppercase text-xs hover:bg-border transition-colors"
-          >
-            Menu
+          <button onClick={() => { if (onSave && history.length > 0 && !winner && !isDraw) { onSave({ board, isXTurn, history }); } onExit(); }}
+            className="px-3 py-2 rounded-lg bg-muted text-foreground font-bold tracking-wider uppercase text-xs hover:bg-border transition-colors">
+            {t("game.menu")}
           </button>
         )}
         {(winner || isDraw) && onGameEnd && !gameEnded && (
-          <button
-            onClick={handleConfirmResult}
+          <button onClick={handleConfirmResult}
             className="px-3 py-2 rounded-lg font-bold tracking-wider uppercase text-xs transition-colors"
-            style={{
-              backgroundColor: "hsl(var(--primary))",
-              color: "hsl(var(--primary-foreground))",
-              boxShadow: "var(--neon-glow)",
-            }}
-          >
-            Zatwierdź wynik
+            style={{ backgroundColor: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))", boxShadow: "var(--neon-glow)" }}>
+            {t("game.confirmResult")}
           </button>
         )}
         {onBack && gameEnded && (
-          <button
-            onClick={onBack}
+          <button onClick={onBack}
             className="px-3 py-2 rounded-lg font-bold tracking-wider uppercase text-xs transition-colors"
-            style={{
-              backgroundColor: "hsl(var(--accent))",
-              color: "hsl(var(--accent-foreground))",
-              boxShadow: "var(--neon-glow-accent)",
-            }}
-          >
-            Wróć do turnieju
+            style={{ backgroundColor: "hsl(var(--accent))", color: "hsl(var(--accent-foreground))", boxShadow: "var(--neon-glow-accent)" }}>
+            {t("game.backToTournament")}
           </button>
         )}
       </div>
