@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Swords, Trophy, Users, Play, Trash2, BarChart3, BookOpen, Globe } from "lucide-react";
+import { Swords, Trophy, Users, Play, Trash2, BarChart3, BookOpen, Globe, Palette } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { hasSavedSingleGame, hasSavedTournament, clearSingleGame, clearTournament } from "@/lib/storage";
 import { VERSION_STRING } from "@/lib/version";
 import { t, useLang, LANG_OPTIONS } from "@/lib/i18n";
+import { useTheme, THEMES, getThemeConfig } from "@/lib/theme";
 
 interface MainMenuProps {
   onSingleGame: () => void;
@@ -21,42 +22,75 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
   const [confirmDelete, setConfirmDelete] = useState<"single" | "tournament" | null>(null);
   const [lang, setLang] = useLang();
   const [showLang, setShowLang] = useState(false);
+  const [themeId, setTheme] = useTheme();
+  const [showTheme, setShowTheme] = useState(false);
+  const theme = getThemeConfig(themeId);
 
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-md px-4">
-      {/* Language selector */}
-      <div className="self-end relative">
-        <button
-          onClick={() => setShowLang(!showLang)}
-          className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs transition-colors hover:bg-muted"
-          style={{ color: "hsl(var(--muted-foreground))" }}
-        >
-          <Globe className="w-3.5 h-3.5" />
-          {LANG_OPTIONS.find((l) => l.code === lang)?.flag}
-        </button>
-        {showLang && (
-          <div className="absolute right-0 top-full mt-1 rounded-lg border border-border bg-card shadow-lg z-50 overflow-hidden">
-            {LANG_OPTIONS.map((l) => (
-              <button
-                key={l.code}
-                onClick={() => { setLang(l.code); setShowLang(false); }}
-                className={`flex items-center gap-2 w-full px-3 py-2 text-xs text-left transition-colors hover:bg-muted ${lang === l.code ? "bg-primary/10 text-primary" : "text-foreground"}`}
-              >
-                <span>{l.flag}</span>
-                <span>{l.label}</span>
-              </button>
-            ))}
-          </div>
-        )}
+      {/* Top bar: theme + language */}
+      <div className="flex justify-between w-full">
+        {/* Theme selector */}
+        <div className="relative">
+          <button
+            onClick={() => { setShowTheme(!showTheme); setShowLang(false); }}
+            className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs transition-colors hover:bg-muted"
+            style={{ color: "hsl(var(--muted-foreground))" }}
+          >
+            <Palette className="w-3.5 h-3.5" />
+            {theme.emoji}
+          </button>
+          {showTheme && (
+            <div className="absolute left-0 top-full mt-1 rounded-lg border border-border bg-card shadow-lg z-50 overflow-hidden">
+              {THEMES.map((th) => (
+                <button
+                  key={th.id}
+                  onClick={() => { setTheme(th.id); setShowTheme(false); }}
+                  className={`flex items-center gap-2 w-full px-3 py-2 text-xs text-left transition-colors hover:bg-muted ${themeId === th.id ? "bg-primary/10 text-primary" : "text-foreground"}`}
+                >
+                  <span>{th.emoji}</span>
+                  <span>{th.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Language selector */}
+        <div className="relative">
+          <button
+            onClick={() => { setShowLang(!showLang); setShowTheme(false); }}
+            className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs transition-colors hover:bg-muted"
+            style={{ color: "hsl(var(--muted-foreground))" }}
+          >
+            <Globe className="w-3.5 h-3.5" />
+            {LANG_OPTIONS.find((l) => l.code === lang)?.flag}
+          </button>
+          {showLang && (
+            <div className="absolute right-0 top-full mt-1 rounded-lg border border-border bg-card shadow-lg z-50 overflow-hidden">
+              {LANG_OPTIONS.map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => { setLang(l.code); setShowLang(false); }}
+                  className={`flex items-center gap-2 w-full px-3 py-2 text-xs text-left transition-colors hover:bg-muted ${lang === l.code ? "bg-primary/10 text-primary" : "text-foreground"}`}
+                >
+                  <span>{l.flag}</span>
+                  <span>{l.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <motion.h1
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 200, damping: 12 }}
-        className="text-3xl sm:text-5xl font-bold tracking-widest text-center leading-relaxed"
+        className="text-3xl sm:text-4xl font-black tracking-wide text-center leading-relaxed"
         style={{
-          fontFamily: "'Cinzel', serif",
+          fontFamily: theme.headingFont,
+          fontSize: themeId === "arcade" ? undefined : "2.5rem",
           color: "hsl(var(--primary))",
           textShadow: "var(--neon-glow), 0 0 40px hsl(var(--primary) / 0.3)",
         }}
@@ -64,43 +98,28 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
         FIVE{" "}
         <span style={{ color: "hsl(var(--secondary))", textShadow: "var(--neon-glow-secondary)" }}>STRIKE</span>
       </motion.h1>
-      <p className="text-muted-foreground text-sm tracking-[0.2em] text-center uppercase italic" style={{ fontFamily: "'Cinzel', serif" }}>
+      <p className="text-muted-foreground text-xs tracking-widest text-center uppercase" style={{ fontFamily: theme.headingFont, fontSize: themeId === "arcade" ? "0.6rem" : "0.75rem" }}>
         {t("menu.subtitle")}
       </p>
 
       <div className="flex items-center gap-4 text-2xl font-bold">
-        <span className="text-primary" style={{ textShadow: "var(--neon-glow)", fontFamily: "'Cinzel', serif" }}>✕</span>
-        <span className="text-muted-foreground text-xs italic">VS</span>
-        <span className="text-secondary" style={{ textShadow: "var(--neon-glow-secondary)", fontFamily: "'Cinzel', serif" }}>○</span>
+        <span className="text-primary" style={{ textShadow: "var(--neon-glow)", fontFamily: theme.headingFont }}>✕</span>
+        <span className="text-muted-foreground text-xs">VS</span>
+        <span className="text-secondary" style={{ textShadow: "var(--neon-glow-secondary)", fontFamily: theme.headingFont }}>○</span>
       </div>
 
       <div className="flex flex-col gap-4 w-full mt-4">
         {hasSingle && (
           <div className="flex gap-2 w-full">
-            <button
-              onClick={onResumeSingle}
+            <button onClick={onResumeSingle}
               className="flex items-center justify-center gap-3 flex-1 py-3 rounded-xl font-bold text-base uppercase tracking-wider transition-all duration-200 hover:scale-[1.02]"
-              style={{
-                backgroundColor: "hsl(var(--accent) / 0.1)",
-                border: "2px solid hsl(var(--accent) / 0.4)",
-                color: "hsl(var(--accent))",
-                textShadow: "var(--neon-glow-accent)",
-                boxShadow: "var(--neon-glow-accent)",
-              }}
-            >
-              <Play className="w-5 h-5" />
-              {t("menu.continueGame")}
+              style={{ backgroundColor: "hsl(var(--accent) / 0.1)", border: "2px solid hsl(var(--accent) / 0.4)", color: "hsl(var(--accent))", textShadow: "var(--neon-glow-accent)", boxShadow: "var(--neon-glow-accent)" }}>
+              <Play className="w-5 h-5" /> {t("menu.continueGame")}
             </button>
-            <button
-              onClick={() => setConfirmDelete("single")}
+            <button onClick={() => setConfirmDelete("single")}
               className="flex items-center justify-center px-3 py-3 rounded-xl font-bold transition-all duration-200 hover:scale-[1.05]"
-              style={{
-                backgroundColor: "hsl(0 60% 50% / 0.15)",
-                border: "2px solid hsl(0 60% 50% / 0.4)",
-                color: "hsl(0 60% 50%)",
-              }}
-              title={t("menu.deleteSavedGame")}
-            >
+              style={{ backgroundColor: "hsl(0 60% 50% / 0.15)", border: "2px solid hsl(0 60% 50% / 0.4)", color: "hsl(0 60% 50%)" }}
+              title={t("menu.deleteSavedGame")}>
               <Trash2 className="w-5 h-5" />
             </button>
           </div>
@@ -108,94 +127,66 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
 
         {hasTournament && (
           <div className="flex gap-2 w-full">
-            <button
-              onClick={onResumeTournament}
+            <button onClick={onResumeTournament}
               className="flex items-center justify-center gap-3 flex-1 py-3 rounded-xl font-bold text-base uppercase tracking-wider transition-all duration-200 hover:scale-[1.02]"
-              style={{
-                backgroundColor: "hsl(var(--accent) / 0.1)",
-                border: "2px solid hsl(var(--accent) / 0.4)",
-                color: "hsl(var(--accent))",
-                textShadow: "var(--neon-glow-accent)",
-                boxShadow: "var(--neon-glow-accent)",
-              }}
-            >
-              <Play className="w-5 h-5" />
-              {t("menu.continueTournament")}
+              style={{ backgroundColor: "hsl(var(--accent) / 0.1)", border: "2px solid hsl(var(--accent) / 0.4)", color: "hsl(var(--accent))", textShadow: "var(--neon-glow-accent)", boxShadow: "var(--neon-glow-accent)" }}>
+              <Play className="w-5 h-5" /> {t("menu.continueTournament")}
             </button>
-            <button
-              onClick={() => setConfirmDelete("tournament")}
+            <button onClick={() => setConfirmDelete("tournament")}
               className="flex items-center justify-center px-3 py-3 rounded-xl font-bold transition-all duration-200 hover:scale-[1.05]"
-              style={{
-                backgroundColor: "hsl(0 60% 50% / 0.15)",
-                border: "2px solid hsl(0 60% 50% / 0.4)",
-                color: "hsl(0 60% 50%)",
-              }}
-              title={t("menu.deleteSavedTournament")}
-            >
+              style={{ backgroundColor: "hsl(0 60% 50% / 0.15)", border: "2px solid hsl(0 60% 50% / 0.4)", color: "hsl(0 60% 50%)" }}
+              title={t("menu.deleteSavedTournament")}>
               <Trash2 className="w-5 h-5" />
             </button>
           </div>
         )}
 
-        <motion.button onClick={onSingleGame} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
-          className="flex items-center justify-center gap-3 w-full py-4 rounded font-bold text-sm uppercase tracking-wider transition-colors"
-          style={{ fontFamily: "'Cinzel', serif", backgroundColor: "hsl(var(--primary) / 0.12)", border: "2px solid hsl(var(--primary) / 0.5)", color: "hsl(var(--primary))", textShadow: "var(--neon-glow)", boxShadow: "var(--neon-glow), inset 0 0 20px hsl(var(--primary) / 0.05)" }}
-        >
-          <Swords className="w-5 h-5" />
-          {t("menu.singleGame")}
-        </motion.button>
-
-        <motion.button onClick={onDuel} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
-          className="flex items-center justify-center gap-3 w-full py-4 rounded font-bold text-sm uppercase tracking-wider transition-colors"
-          style={{ fontFamily: "'Cinzel', serif", backgroundColor: "hsl(var(--secondary) / 0.12)", border: "2px solid hsl(var(--secondary) / 0.5)", color: "hsl(var(--secondary))", textShadow: "var(--neon-glow-secondary)", boxShadow: "var(--neon-glow-secondary), inset 0 0 20px hsl(var(--secondary) / 0.05)" }}
-        >
-          <Users className="w-5 h-5" />
-          {t("menu.duel")}
-        </motion.button>
-
-        <motion.button onClick={onTournament} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
-          className="flex items-center justify-center gap-3 w-full py-4 rounded font-bold text-sm uppercase tracking-wider transition-colors"
-          style={{ fontFamily: "'Cinzel', serif", backgroundColor: "hsl(var(--accent) / 0.12)", border: "2px solid hsl(var(--accent) / 0.5)", color: "hsl(var(--accent))", textShadow: "var(--neon-glow-accent)", boxShadow: "var(--neon-glow-accent), inset 0 0 20px hsl(var(--accent) / 0.05)" }}
-        >
-          <Trophy className="w-5 h-5" />
-          {t("menu.tournament")}
-        </motion.button>
+        {[
+          { onClick: onSingleGame, icon: Swords, label: t("menu.singleGame"), variant: "primary" as const },
+          { onClick: onDuel, icon: Users, label: t("menu.duel"), variant: "secondary" as const },
+          { onClick: onTournament, icon: Trophy, label: t("menu.tournament"), variant: "accent" as const },
+        ].map(({ onClick, icon: Icon, label, variant }) => (
+          <motion.button key={label} onClick={onClick} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
+            className="flex items-center justify-center gap-3 w-full py-4 rounded font-bold text-sm uppercase tracking-wider transition-colors"
+            style={{
+              fontFamily: theme.headingFont,
+              fontSize: themeId === "arcade" ? "0.7rem" : "0.85rem",
+              backgroundColor: `hsl(var(--${variant}) / 0.15)`,
+              border: `3px solid hsl(var(--${variant}) / 0.5)`,
+              color: `hsl(var(--${variant}))`,
+              textShadow: `var(--neon-glow${variant === "primary" ? "" : `-${variant}`})`,
+              boxShadow: `var(--neon-glow${variant === "primary" ? "" : `-${variant}`}), inset 0 0 20px hsl(var(--${variant}) / 0.05)`,
+            }}>
+            <Icon className="w-5 h-5" /> {label}
+          </motion.button>
+        ))}
 
         <motion.button onClick={onHistory} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
           className="flex items-center justify-center gap-3 w-full py-4 rounded font-bold text-sm uppercase tracking-wider transition-colors"
-          style={{ fontFamily: "'Cinzel', serif", backgroundColor: "hsl(var(--muted))", border: "2px solid hsl(var(--border))", color: "hsl(var(--muted-foreground))" }}
-        >
-          <BarChart3 className="w-5 h-5" />
-          {t("menu.scoreboard")}
+          style={{ fontFamily: theme.headingFont, fontSize: themeId === "arcade" ? "0.7rem" : "0.85rem", backgroundColor: "hsl(var(--muted))", border: "3px solid hsl(var(--border))", color: "hsl(var(--muted-foreground))" }}>
+          <BarChart3 className="w-5 h-5" /> {t("menu.scoreboard")}
         </motion.button>
 
         <motion.button onClick={onRules} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
           className="flex items-center justify-center gap-3 w-full py-3 rounded font-bold text-sm uppercase tracking-wider transition-colors"
-          style={{ fontFamily: "'Cinzel', serif", fontSize: "0.75rem", backgroundColor: "transparent", border: "2px solid hsl(var(--border))", color: "hsl(var(--muted-foreground))" }}
-        >
-          <BookOpen className="w-4 h-4" />
-          {t("menu.rules")}
+          style={{ fontFamily: theme.headingFont, fontSize: themeId === "arcade" ? "0.6rem" : "0.75rem", backgroundColor: "transparent", border: "2px solid hsl(var(--border))", color: "hsl(var(--muted-foreground))" }}>
+          <BookOpen className="w-4 h-4" /> {t("menu.rules")}
         </motion.button>
       </div>
 
-      <p className="text-muted-foreground/50 text-center mt-2 text-xs italic" style={{ fontFamily: "'Cinzel', serif" }}>
+      <p className="text-muted-foreground/50 text-center mt-2" style={{ fontFamily: theme.headingFont, fontSize: "0.45rem" }}>
         {VERSION_STRING}
       </p>
 
       <AnimatePresence>
         {confirmDelete && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style={{ backgroundColor: "hsl(0 0% 0% / 0.7)" }}
-            onClick={() => setConfirmDelete(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}
+            style={{ backgroundColor: "hsl(0 0% 0% / 0.7)" }} onClick={() => setConfirmDelete(null)}>
+            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}
               className="flex flex-col items-center gap-4 p-6 rounded-xl max-w-sm w-full"
               style={{ backgroundColor: "hsl(var(--card))", border: "2px solid hsl(0 60% 50% / 0.4)", boxShadow: "0 0 30px hsl(0 60% 50% / 0.2)" }}
-              onClick={(e) => e.stopPropagation()}
-            >
+              onClick={(e) => e.stopPropagation()}>
               <Trash2 className="w-8 h-8" style={{ color: "hsl(0 60% 50%)" }} />
               <p className="text-center text-foreground font-bold text-sm">
                 {confirmDelete === "single" ? t("confirm.deleteGame") : t("confirm.deleteTournament")}
@@ -204,15 +195,12 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
                 <button onClick={() => setConfirmDelete(null)} className="flex-1 py-2 rounded-lg font-bold uppercase text-xs tracking-wider bg-muted text-foreground hover:bg-border transition-colors">
                   {t("btn.cancel")}
                 </button>
-                <button
-                  onClick={() => {
-                    if (confirmDelete === "single") { clearSingleGame(); setHasSingle(false); }
-                    else { clearTournament(); setHasTournament(false); }
-                    setConfirmDelete(null);
-                  }}
-                  className="flex-1 py-2 rounded-lg font-bold uppercase text-xs tracking-wider transition-colors"
-                  style={{ backgroundColor: "hsl(0 60% 50%)", color: "hsl(0 0% 100%)" }}
-                >
+                <button onClick={() => {
+                  if (confirmDelete === "single") { clearSingleGame(); setHasSingle(false); }
+                  else { clearTournament(); setHasTournament(false); }
+                  setConfirmDelete(null);
+                }} className="flex-1 py-2 rounded-lg font-bold uppercase text-xs tracking-wider transition-colors"
+                  style={{ backgroundColor: "hsl(0 60% 50%)", color: "hsl(0 0% 100%)" }}>
                   {t("btn.delete")}
                 </button>
               </div>
