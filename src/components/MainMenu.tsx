@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Swords, Trophy, Users, Play, Trash2 } from "lucide-react";
+import { Swords, Trophy, Users, Play, Trash2, BarChart3 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { hasSavedSingleGame, hasSavedTournament, clearSingleGame, clearTournament } from "@/lib/storage";
 import logoArcade from "@/assets/logo-arcade.png";
@@ -10,9 +10,10 @@ interface MainMenuProps {
   onTournament: () => void;
   onResumeSingle: () => void;
   onResumeTournament: () => void;
+  onHistory: () => void;
 }
 
-const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResumeTournament }: MainMenuProps) => {
+const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResumeTournament, onHistory }: MainMenuProps) => {
   const [hasSingle, setHasSingle] = useState(hasSavedSingleGame());
   const [hasTournament, setHasTournament] = useState(hasSavedTournament());
   const [confirmDelete, setConfirmDelete] = useState<"single" | "tournament" | null>(null);
@@ -163,6 +164,23 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
         >
           <Trophy className="w-5 h-5" />
           Turniej wieloosobowy
+        </motion.button>
+
+        <motion.button
+          onClick={onHistory}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.97 }}
+          className="flex items-center justify-center gap-3 w-full py-4 rounded font-bold text-sm uppercase tracking-wider transition-colors"
+          style={{
+            fontFamily: "'Press Start 2P', cursive",
+            fontSize: "0.7rem",
+            backgroundColor: "hsl(var(--muted))",
+            border: "3px solid hsl(var(--border))",
+            color: "hsl(var(--muted-foreground))",
+          }}
+        >
+          <BarChart3 className="w-5 h-5" />
+          Tablica wyników
         </motion.button>
       </div>
 

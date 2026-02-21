@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, Plus, X, Trophy, Users, Save } from "lucide-react";
 import { Player, TournamentMatch, generateRoundRobinMatches, calculateStandings } from "@/lib/tournament";
-import { saveTournament, clearTournament } from "@/lib/storage";
+import { saveTournament, clearTournament, addGameToHistory } from "@/lib/storage";
 import GameBoard, { GameResult } from "./GameBoard";
 
 interface TournamentModeProps {
@@ -67,6 +67,14 @@ const TournamentMode = ({ onBack, resumePlayers, resumeMatches, minPlayers = 2, 
           : m
       )
     );
+    const mode = maxPlayers === 2 ? "duel" : "tournament";
+    addGameToHistory({
+      playerX: swapPlayers ? currentMatch.playerB.name : currentMatch.playerA.name,
+      playerO: swapPlayers ? currentMatch.playerA.name : currentMatch.playerB.name,
+      winner: result.winner,
+      isDraw: result.isDraw,
+      mode: mode as "duel" | "tournament",
+    });
   };
 
   const backToBracket = () => {

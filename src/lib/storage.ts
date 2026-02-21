@@ -5,6 +5,7 @@ import { Player, TournamentMatch } from "./tournament";
 const KEYS = {
   SINGLE_GAME: "fiveinarow_single_game",
   TOURNAMENT: "fiveinarow_tournament",
+  HISTORY: "fiveinarow_history",
 };
 
 // Single game save
@@ -57,3 +58,32 @@ export const clearTournament = () => {
 
 export const hasSavedSingleGame = (): boolean => !!localStorage.getItem(KEYS.SINGLE_GAME);
 export const hasSavedTournament = (): boolean => !!localStorage.getItem(KEYS.TOURNAMENT);
+
+// Game history
+export interface GameHistoryEntry {
+  id: string;
+  playerX: string;
+  playerO: string;
+  winner: string | null;
+  isDraw: boolean;
+  mode: "single" | "duel" | "tournament";
+  date: number;
+}
+
+export const addGameToHistory = (entry: Omit<GameHistoryEntry, "id" | "date">) => {
+  const history = getGameHistory();
+  history.unshift({ ...entry, id: crypto.randomUUID(), date: Date.now() });
+  // Keep last 100 entries
+  localStorage.setItem(KEYS.HISTORY, JSON.stringify(history.slice(0, 100)));
+};
+
+export const getGameHistory = (): GameHistoryEntry[] => {
+  try {
+    const raw = localStorage.getItem(KEYS.HISTORY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+};
+
+export const clearGameHistory = () => {
+  localStorage.removeItem(KEYS.HISTORY);
+};
