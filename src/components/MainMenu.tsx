@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Swords, Trophy, Users, Play, Trash2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { hasSavedSingleGame, hasSavedTournament, clearSingleGame, clearTournament } from "@/lib/storage";
 import logoArcade from "@/assets/logo-arcade.png";
 
@@ -15,6 +15,7 @@ interface MainMenuProps {
 const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResumeTournament }: MainMenuProps) => {
   const [hasSingle, setHasSingle] = useState(hasSavedSingleGame());
   const [hasTournament, setHasTournament] = useState(hasSavedTournament());
+  const [confirmDelete, setConfirmDelete] = useState<"single" | "tournament" | null>(null);
 
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-md px-4">
@@ -62,7 +63,7 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
               Kontynuuj grę
             </button>
             <button
-              onClick={() => { clearSingleGame(); setHasSingle(false); }}
+              onClick={() => setConfirmDelete("single")}
               className="flex items-center justify-center px-3 py-3 rounded-xl font-bold transition-all duration-200 hover:scale-[1.05]"
               style={{
                 backgroundColor: "hsl(0 60% 50% / 0.15)",
@@ -93,7 +94,7 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
               Kontynuuj turniej
             </button>
             <button
-              onClick={() => { clearTournament(); setHasTournament(false); }}
+              onClick={() => setConfirmDelete("tournament")}
               className="flex items-center justify-center px-3 py-3 rounded-xl font-bold transition-all duration-200 hover:scale-[1.05]"
               style={{
                 backgroundColor: "hsl(0 60% 50% / 0.15)",
@@ -164,6 +165,67 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
           Turniej wieloosobowy
         </motion.button>
       </div>
+
+      {/* Confirmation dialog */}
+      <AnimatePresence>
+        {confirmDelete && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ backgroundColor: "hsl(0 0% 0% / 0.7)" }}
+            onClick={() => setConfirmDelete(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              className="flex flex-col items-center gap-4 p-6 rounded-xl max-w-sm w-full"
+              style={{
+                backgroundColor: "hsl(var(--card))",
+                border: "2px solid hsl(0 60% 50% / 0.4)",
+                boxShadow: "0 0 30px hsl(0 60% 50% / 0.2)",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Trash2 className="w-8 h-8" style={{ color: "hsl(0 60% 50%)" }} />
+              <p className="text-center text-foreground font-bold text-sm">
+                {confirmDelete === "single"
+                  ? "Czy na pewno chcesz usunąć zapisaną grę?"
+                  : "Czy na pewno chcesz usunąć zapisany turniej?"}
+              </p>
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => setConfirmDelete(null)}
+                  className="flex-1 py-2 rounded-lg font-bold uppercase text-xs tracking-wider bg-muted text-foreground hover:bg-border transition-colors"
+                >
+                  Anuluj
+                </button>
+                <button
+                  onClick={() => {
+                    if (confirmDelete === "single") {
+                      clearSingleGame();
+                      setHasSingle(false);
+                    } else {
+                      clearTournament();
+                      setHasTournament(false);
+                    }
+                    setConfirmDelete(null);
+                  }}
+                  className="flex-1 py-2 rounded-lg font-bold uppercase text-xs tracking-wider transition-colors"
+                  style={{
+                    backgroundColor: "hsl(0 60% 50%)",
+                    color: "hsl(0 0% 100%)",
+                  }}
+                >
+                  Usuń
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
