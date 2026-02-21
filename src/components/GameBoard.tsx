@@ -89,11 +89,19 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
     return newBoard;
   }, []);
 
+  const centerCells = useMemo(() => {
+    const mid = Math.floor(BOARD_SIZE / 2);
+    return new Set([`${mid-1}-${mid-1}`, `${mid-1}-${mid}`, `${mid}-${mid-1}`, `${mid}-${mid}`]);
+  }, []);
+
+  const isFirstMove = history.length === 0;
+
   const handleClick = useCallback((row: number, col: number) => {
     if (board[row][col] || winner || aiThinking) return;
     if (isAI && !isXTurn) return;
+    if (isFirstMove && !centerCells.has(`${row}-${col}`)) return;
     placeMove(row, col, board, isXTurn);
-  }, [board, isXTurn, winner, aiThinking, isAI, placeMove]);
+  }, [board, isXTurn, winner, aiThinking, isAI, placeMove, isFirstMove, centerCells]);
 
   const aiThinkingRef = useRef(false);
 
@@ -257,8 +265,8 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
               <button
                 key={`${ri}-${ci}`}
                 onClick={() => handleClick(ri, ci)}
-                disabled={!!winner || !!cell || aiThinking}
-                className={`aspect-square w-full bg-card border border-border/50 flex items-center justify-center text-[10px] sm:text-base font-bold transition-all duration-150 hover:bg-muted hover:border-primary/40 disabled:cursor-default relative ${isWin ? "z-10" : ""}`}
+                disabled={!!winner || !!cell || aiThinking || (isFirstMove && !centerCells.has(`${ri}-${ci}`))}
+                className={`aspect-square w-full bg-card border border-border/50 flex items-center justify-center text-[10px] sm:text-base font-bold transition-all duration-150 hover:bg-muted hover:border-primary/40 disabled:cursor-default relative ${isWin ? "z-10" : ""} ${isFirstMove && !cell && centerCells.has(`${ri}-${ci}`) ? "ring-1 ring-primary/50 animate-pulse" : ""}`}
                 style={cell ? {
                   color: cell === "X" ? "hsl(var(--primary))" : "hsl(var(--secondary))",
                   textShadow: cell === "X" ? "var(--neon-glow)" : "var(--neon-glow-secondary)",

@@ -97,9 +97,11 @@ export const getAIMove = (board: Cell[][], aiPlayer: Cell): [number, number] => 
     }
   }
 
-  // If board is empty, play center
+  // If board is empty, play one of the 4 center cells
   if (candidates.size === 0) {
-    return [Math.floor(BOARD_SIZE / 2), Math.floor(BOARD_SIZE / 2)];
+    const mid = Math.floor(BOARD_SIZE / 2);
+    const centerCells: [number, number][] = [[mid-1, mid-1], [mid-1, mid], [mid, mid-1], [mid, mid]];
+    return centerCells[Math.floor(Math.random() * centerCells.length)];
   }
 
   for (const key of candidates) {

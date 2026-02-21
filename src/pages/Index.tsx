@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import MainMenu from "@/components/MainMenu";
 import SingleGame from "@/components/SingleGame";
 import TournamentMode from "@/components/TournamentMode";
+import GameRules from "@/components/GameRules";
 import GameHistory from "@/components/GameHistory";
 import { loadSingleGame, loadTournament } from "@/lib/storage";
 import bgArcade from "@/assets/bg-arcade.png";
 
-type Screen = "menu" | "single" | "single-resume" | "duel" | "tournament" | "tournament-resume" | "history";
+type Screen = "menu" | "single" | "single-resume" | "duel" | "tournament" | "tournament-resume" | "history" | "rules";
 
 const screenVariants = {
   initial: { opacity: 0, scale: 0.95, y: 20 },
@@ -51,6 +52,7 @@ const Index = () => {
                 onResumeSingle={() => setScreen("single-resume")}
                 onResumeTournament={() => setScreen("tournament-resume")}
                 onHistory={() => setScreen("history")}
+                onRules={() => setScreen("rules")}
               />
             </motion.div>
           )}
@@ -124,6 +126,19 @@ const Index = () => {
               className="w-full flex flex-col items-center"
             >
               <GameHistory onBack={() => setScreen("menu")} />
+            </motion.div>
+          )}
+          {screen === "rules" && (
+            <motion.div
+              key="rules"
+              variants={screenVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="w-full flex flex-col items-center"
+            >
+              <GameRules onBack={() => setScreen("menu")} />
             </motion.div>
           )}
         </AnimatePresence>
