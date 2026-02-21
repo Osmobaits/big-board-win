@@ -266,7 +266,7 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
                 key={`${ri}-${ci}`}
                 onClick={() => handleClick(ri, ci)}
                 disabled={!!winner || !!cell || aiThinking || (isFirstMove && !centerCells.has(`${ri}-${ci}`))}
-                className={`aspect-square w-full bg-card border border-border/50 flex items-center justify-center text-[10px] sm:text-base font-bold transition-all duration-150 hover:bg-muted hover:border-primary/40 disabled:cursor-default relative ${isWin ? "z-10" : ""} ${isFirstMove && !cell && centerCells.has(`${ri}-${ci}`) ? "ring-1 ring-primary/50 animate-pulse" : ""}`}
+                className={`aspect-square w-full bg-card border border-border/50 flex items-center justify-center text-[10px] sm:text-base font-bold transition-all duration-150 hover:bg-muted hover:border-primary/40 disabled:cursor-default relative ${isWin ? "z-10" : ""} ${isFirstMove && !cell && centerCells.has(`${ri}-${ci}`) ? "bg-primary/10 border-primary/40" : ""}`}
                 style={cell ? {
                   color: cell === "X" ? "hsl(var(--primary))" : "hsl(var(--secondary))",
                   textShadow: cell === "X" ? "var(--neon-glow)" : "var(--neon-glow-secondary)",
