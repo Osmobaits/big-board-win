@@ -148,12 +148,21 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
     if (!isAI) setSwapped((s) => !s);
   };
 
-  const handleConfirmResult = () => {
+  const autoConfirm = !onBack && !!onGameEnd;
+
+  const handleConfirmResult = useCallback(() => {
     if (!gameEnded && (winner || isDraw)) {
       setGameEnded(true);
       onGameEnd?.({ winner: winnerName, isDraw });
     }
-  };
+  }, [gameEnded, winner, isDraw, winnerName, onGameEnd]);
+
+  // Auto-confirm result in single game mode (no onBack = no tournament)
+  useEffect(() => {
+    if (autoConfirm && (winner || isDraw) && !gameEnded) {
+      handleConfirmResult();
+    }
+  }, [autoConfirm, winner, isDraw, gameEnded, handleConfirmResult]);
 
   const declareDraw = () => {
     if (!winner && !isDraw && history.length > 0) {
