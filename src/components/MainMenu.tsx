@@ -35,9 +35,7 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
           {LANG_OPTIONS.find((l) => l.code === lang)?.flag}
         </button>
         {showLang && (
-          <div
-            className="absolute right-0 top-full mt-1 rounded-lg border border-border bg-card shadow-lg z-50 overflow-hidden"
-          >
+          <div className="absolute right-0 top-full mt-1 rounded-lg border border-border bg-card shadow-lg z-50 overflow-hidden">
             {LANG_OPTIONS.map((l) => (
               <button
                 key={l.code}
@@ -56,9 +54,9 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 200, damping: 12 }}
-        className="text-3xl sm:text-4xl font-black tracking-wide text-center leading-relaxed"
+        className="text-3xl sm:text-5xl font-bold tracking-widest text-center leading-relaxed"
         style={{
-          fontFamily: "'Press Start 2P', cursive",
+          fontFamily: "'Cinzel', serif",
           color: "hsl(var(--primary))",
           textShadow: "var(--neon-glow), 0 0 40px hsl(var(--primary) / 0.3)",
         }}
@@ -66,14 +64,14 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
         FIVE{" "}
         <span style={{ color: "hsl(var(--secondary))", textShadow: "var(--neon-glow-secondary)" }}>STRIKE</span>
       </motion.h1>
-      <p className="text-muted-foreground text-xs tracking-widest text-center uppercase" style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "0.6rem" }}>
+      <p className="text-muted-foreground text-sm tracking-[0.2em] text-center uppercase italic" style={{ fontFamily: "'Cinzel', serif" }}>
         {t("menu.subtitle")}
       </p>
 
       <div className="flex items-center gap-4 text-2xl font-bold">
-        <span className="text-primary" style={{ textShadow: "var(--neon-glow)", fontFamily: "'Press Start 2P', cursive" }}>✕</span>
-        <span className="text-muted-foreground text-xs">VS</span>
-        <span className="text-secondary" style={{ textShadow: "var(--neon-glow-secondary)", fontFamily: "'Press Start 2P', cursive" }}>○</span>
+        <span className="text-primary" style={{ textShadow: "var(--neon-glow)", fontFamily: "'Cinzel', serif" }}>✕</span>
+        <span className="text-muted-foreground text-xs italic">VS</span>
+        <span className="text-secondary" style={{ textShadow: "var(--neon-glow-secondary)", fontFamily: "'Cinzel', serif" }}>○</span>
       </div>
 
       <div className="flex flex-col gap-4 w-full mt-4">
@@ -141,7 +139,7 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
 
         <motion.button onClick={onSingleGame} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
           className="flex items-center justify-center gap-3 w-full py-4 rounded font-bold text-sm uppercase tracking-wider transition-colors"
-          style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "0.7rem", backgroundColor: "hsl(var(--primary) / 0.15)", border: "3px solid hsl(var(--primary) / 0.5)", color: "hsl(var(--primary))", textShadow: "var(--neon-glow)", boxShadow: "var(--neon-glow), inset 0 0 20px hsl(var(--primary) / 0.05)" }}
+          style={{ fontFamily: "'Cinzel', serif", backgroundColor: "hsl(var(--primary) / 0.12)", border: "2px solid hsl(var(--primary) / 0.5)", color: "hsl(var(--primary))", textShadow: "var(--neon-glow)", boxShadow: "var(--neon-glow), inset 0 0 20px hsl(var(--primary) / 0.05)" }}
         >
           <Swords className="w-5 h-5" />
           {t("menu.singleGame")}
@@ -149,7 +147,7 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
 
         <motion.button onClick={onDuel} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
           className="flex items-center justify-center gap-3 w-full py-4 rounded font-bold text-sm uppercase tracking-wider transition-colors"
-          style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "0.7rem", backgroundColor: "hsl(var(--secondary) / 0.15)", border: "3px solid hsl(var(--secondary) / 0.5)", color: "hsl(var(--secondary))", textShadow: "var(--neon-glow-secondary)", boxShadow: "var(--neon-glow-secondary), inset 0 0 20px hsl(var(--secondary) / 0.05)" }}
+          style={{ fontFamily: "'Cinzel', serif", backgroundColor: "hsl(var(--secondary) / 0.12)", border: "2px solid hsl(var(--secondary) / 0.5)", color: "hsl(var(--secondary))", textShadow: "var(--neon-glow-secondary)", boxShadow: "var(--neon-glow-secondary), inset 0 0 20px hsl(var(--secondary) / 0.05)" }}
         >
           <Users className="w-5 h-5" />
           {t("menu.duel")}
@@ -157,7 +155,7 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
 
         <motion.button onClick={onTournament} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
           className="flex items-center justify-center gap-3 w-full py-4 rounded font-bold text-sm uppercase tracking-wider transition-colors"
-          style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "0.7rem", backgroundColor: "hsl(var(--accent) / 0.15)", border: "3px solid hsl(var(--accent) / 0.5)", color: "hsl(var(--accent))", textShadow: "var(--neon-glow-accent)", boxShadow: "var(--neon-glow-accent), inset 0 0 20px hsl(var(--accent) / 0.05)" }}
+          style={{ fontFamily: "'Cinzel', serif", backgroundColor: "hsl(var(--accent) / 0.12)", border: "2px solid hsl(var(--accent) / 0.5)", color: "hsl(var(--accent))", textShadow: "var(--neon-glow-accent)", boxShadow: "var(--neon-glow-accent), inset 0 0 20px hsl(var(--accent) / 0.05)" }}
         >
           <Trophy className="w-5 h-5" />
           {t("menu.tournament")}
@@ -165,7 +163,7 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
 
         <motion.button onClick={onHistory} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
           className="flex items-center justify-center gap-3 w-full py-4 rounded font-bold text-sm uppercase tracking-wider transition-colors"
-          style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "0.7rem", backgroundColor: "hsl(var(--muted))", border: "3px solid hsl(var(--border))", color: "hsl(var(--muted-foreground))" }}
+          style={{ fontFamily: "'Cinzel', serif", backgroundColor: "hsl(var(--muted))", border: "2px solid hsl(var(--border))", color: "hsl(var(--muted-foreground))" }}
         >
           <BarChart3 className="w-5 h-5" />
           {t("menu.scoreboard")}
@@ -173,14 +171,14 @@ const MainMenu = ({ onSingleGame, onDuel, onTournament, onResumeSingle, onResume
 
         <motion.button onClick={onRules} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
           className="flex items-center justify-center gap-3 w-full py-3 rounded font-bold text-sm uppercase tracking-wider transition-colors"
-          style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "0.6rem", backgroundColor: "transparent", border: "2px solid hsl(var(--border))", color: "hsl(var(--muted-foreground))" }}
+          style={{ fontFamily: "'Cinzel', serif", fontSize: "0.75rem", backgroundColor: "transparent", border: "2px solid hsl(var(--border))", color: "hsl(var(--muted-foreground))" }}
         >
           <BookOpen className="w-4 h-4" />
           {t("menu.rules")}
         </motion.button>
       </div>
 
-      <p className="text-muted-foreground/50 text-center mt-2" style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "0.45rem" }}>
+      <p className="text-muted-foreground/50 text-center mt-2 text-xs italic" style={{ fontFamily: "'Cinzel', serif" }}>
         {VERSION_STRING}
       </p>
 

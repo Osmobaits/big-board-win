@@ -6,7 +6,7 @@ import TournamentMode from "@/components/TournamentMode";
 import GameRules from "@/components/GameRules";
 import GameHistory from "@/components/GameHistory";
 import { loadSingleGame, loadTournament } from "@/lib/storage";
-import bgArcade from "@/assets/bg-arcade.png";
+import bgFantasy from "@/assets/bg-fantasy.png";
 
 type Screen = "menu" | "single" | "single-resume" | "duel" | "tournament" | "tournament-resume" | "history" | "rules";
 
@@ -26,7 +26,7 @@ const Index = () => {
     <div
       className="flex min-h-screen flex-col items-center justify-center gap-8 p-4 relative"
       style={{
-        backgroundImage: `url(${bgArcade})`,
+        backgroundImage: `url(${bgFantasy})`,
         backgroundSize: "512px 512px",
         backgroundRepeat: "repeat",
       }}

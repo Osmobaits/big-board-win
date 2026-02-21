@@ -4,7 +4,7 @@ import { Undo2, Bot, Handshake } from "lucide-react";
 import { getAIMove } from "@/lib/ai";
 import { playPlaceX, playPlaceO, playWin, playDraw } from "@/lib/sounds";
 import { t, useLang } from "@/lib/i18n";
-import winTrophy from "@/assets/win-trophy.png";
+import winRing from "@/assets/win-ring.png";
 
 const BOARD_SIZE = 12;
 const WIN_LENGTH = 5;
@@ -200,7 +200,7 @@ const GameBoard = ({ playerX, playerO, isAI = false, initialState, onGameEnd, on
       <div className="text-center">
         {winner ? (
           <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 300, damping: 15 }} className="flex flex-col items-center gap-2">
-            <motion.img src={winTrophy} alt="Winner!" className="w-16 h-16 sm:w-20 sm:h-20" animate={{ rotate: [0, -5, 5, -5, 0] }} transition={{ duration: 0.5, delay: 0.3 }} />
+            <motion.img src={winRing} alt="Victory!" className="w-16 h-16 sm:w-20 sm:h-20" animate={{ rotate: [0, -5, 5, -5, 0] }} transition={{ duration: 0.5, delay: 0.3 }} />
             <h2 className="text-lg sm:text-2xl font-bold" style={{ color: winner === "X" ? "hsl(var(--primary))" : "hsl(var(--secondary))", textShadow: winner === "X" ? "var(--neon-glow)" : "var(--neon-glow-secondary)" }}>
               {winnerName} {t("game.wins")}
             </h2>
