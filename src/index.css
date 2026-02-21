@@ -3,6 +3,27 @@
 @tailwind utilities;
 
 @font-face {
+  font-family: 'Press Start 2P';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/PressStart2P-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Space Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/SpaceMono-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Space Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/SpaceMono-Bold.ttf') format('truetype');
+}
+@font-face {
   font-family: 'Cinzel';
   font-style: normal;
   font-weight: 400;
@@ -31,8 +52,58 @@
   src: url('/fonts/CrimsonText-Bold.woff2') format('woff2');
 }
 
+/* ===== ARCADE THEME (default) ===== */
 @layer base {
-  :root {
+  :root, [data-theme="arcade"] {
+    --background: 260 30% 8%;
+    --foreground: 60 100% 95%;
+
+    --card: 260 25% 12%;
+    --card-foreground: 60 100% 95%;
+
+    --popover: 260 25% 12%;
+    --popover-foreground: 60 100% 95%;
+
+    --primary: 170 100% 50%;
+    --primary-foreground: 260 30% 8%;
+
+    --secondary: 330 100% 60%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 260 20% 18%;
+    --muted-foreground: 260 10% 50%;
+
+    --accent: 45 100% 55%;
+    --accent-foreground: 260 30% 8%;
+
+    --destructive: 0 90% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 260 20% 22%;
+    --input: 260 20% 22%;
+    --ring: 170 100% 50%;
+
+    --radius: 0.25rem;
+
+    --neon-glow: 0 0 8px hsl(170 100% 50% / 0.6), 0 0 24px hsl(170 100% 50% / 0.25);
+    --neon-glow-secondary: 0 0 8px hsl(330 100% 60% / 0.6), 0 0 24px hsl(330 100% 60% / 0.25);
+    --neon-glow-accent: 0 0 8px hsl(45 100% 55% / 0.6), 0 0 24px hsl(45 100% 55% / 0.25);
+
+    --font-heading: 'Press Start 2P', cursive;
+    --font-body: 'Space Mono', monospace;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  /* ===== FANTASY THEME ===== */
+  [data-theme="fantasy"] {
     --background: 30 15% 8%;
     --foreground: 40 30% 85%;
 
@@ -61,20 +132,12 @@
     --input: 30 15% 22%;
     --ring: 42 85% 55%;
 
-    --radius: 0.25rem;
-
     --neon-glow: 0 0 8px hsl(42 85% 55% / 0.6), 0 0 24px hsl(42 85% 55% / 0.2);
     --neon-glow-secondary: 0 0 8px hsl(15 60% 45% / 0.6), 0 0 24px hsl(15 60% 45% / 0.2);
     --neon-glow-accent: 0 0 8px hsl(28 70% 50% / 0.6), 0 0 24px hsl(28 70% 50% / 0.2);
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --font-heading: 'Cinzel', serif;
+    --font-body: 'Crimson Text', Georgia, serif;
   }
 }
 
@@ -85,10 +148,10 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Crimson Text', Georgia, serif;
+    font-family: var(--font-body);
   }
 
   h1, h2, h3 {
-    font-family: 'Cinzel', serif;
+    font-family: var(--font-heading);
   }
 }
