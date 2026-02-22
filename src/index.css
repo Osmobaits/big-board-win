@@ -102,44 +102,6 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
-  /* ===== FANTASY THEME ===== */
-  [data-theme="fantasy"] {
-    --background: 30 15% 8%;
-    --foreground: 40 30% 85%;
-
-    --card: 30 20% 12%;
-    --card-foreground: 40 30% 85%;
-
-    --popover: 30 20% 12%;
-    --popover-foreground: 40 30% 85%;
-
-    --primary: 42 85% 55%;
-    --primary-foreground: 30 15% 8%;
-
-    --secondary: 15 60% 45%;
-    --secondary-foreground: 40 30% 90%;
-
-    --muted: 30 15% 16%;
-    --muted-foreground: 30 15% 45%;
-
-    --accent: 28 70% 50%;
-    --accent-foreground: 30 15% 8%;
-
-    --destructive: 0 70% 45%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 30 15% 22%;
-    --input: 30 15% 22%;
-    --ring: 42 85% 55%;
-
-    --neon-glow: 0 0 8px hsl(42 85% 55% / 0.6), 0 0 24px hsl(42 85% 55% / 0.2);
-    --neon-glow-secondary: 0 0 8px hsl(15 60% 45% / 0.6), 0 0 24px hsl(15 60% 45% / 0.2);
-    --neon-glow-accent: 0 0 8px hsl(28 70% 50% / 0.6), 0 0 24px hsl(28 70% 50% / 0.2);
-
-    --font-heading: 'Cinzel', serif;
-    --font-body: 'Crimson Text', Georgia, serif;
-  }
-
   /* ===== ANIME THEME ===== */
   [data-theme="anime"] {
     --background: 230 40% 8%;
