@@ -1,10 +1,12 @@
 import { useState, useCallback, useSyncExternalStore } from "react";
 import bgArcade from "@/assets/bg-arcade.png";
 import bgFantasy from "@/assets/bg-fantasy.png";
+import bgAnime from "@/assets/bg-anime.png";
 import winTrophy from "@/assets/win-trophy.png";
 import winRing from "@/assets/win-ring.png";
+import winStar from "@/assets/win-star.png";
 
-export type ThemeId = "arcade" | "fantasy";
+export type ThemeId = "arcade" | "fantasy" | "anime";
 
 export interface ThemeConfig {
   id: ThemeId;
@@ -31,6 +33,14 @@ export const THEMES: ThemeConfig[] = [
     bg: bgFantasy,
     winImage: winRing,
     headingFont: "'Cinzel', serif",
+  },
+  {
+    id: "anime",
+    label: "Anime",
+    emoji: "🌸",
+    bg: bgAnime,
+    winImage: winStar,
+    headingFont: "'Press Start 2P', cursive",
   },
 ];
 

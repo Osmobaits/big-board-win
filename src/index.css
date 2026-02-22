@@ -139,6 +139,44 @@
     --font-heading: 'Cinzel', serif;
     --font-body: 'Crimson Text', Georgia, serif;
   }
+
+  /* ===== ANIME THEME ===== */
+  [data-theme="anime"] {
+    --background: 230 40% 8%;
+    --foreground: 300 30% 92%;
+
+    --card: 230 35% 12%;
+    --card-foreground: 300 30% 92%;
+
+    --popover: 230 35% 12%;
+    --popover-foreground: 300 30% 92%;
+
+    --primary: 330 85% 60%;
+    --primary-foreground: 230 40% 8%;
+
+    --secondary: 200 100% 60%;
+    --secondary-foreground: 230 40% 8%;
+
+    --muted: 230 30% 16%;
+    --muted-foreground: 230 20% 50%;
+
+    --accent: 280 80% 65%;
+    --accent-foreground: 230 40% 8%;
+
+    --destructive: 0 85% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 230 25% 22%;
+    --input: 230 25% 22%;
+    --ring: 330 85% 60%;
+
+    --neon-glow: 0 0 8px hsl(330 85% 60% / 0.6), 0 0 24px hsl(330 85% 60% / 0.25);
+    --neon-glow-secondary: 0 0 8px hsl(200 100% 60% / 0.6), 0 0 24px hsl(200 100% 60% / 0.25);
+    --neon-glow-accent: 0 0 8px hsl(280 80% 65% / 0.6), 0 0 24px hsl(280 80% 65% / 0.25);
+
+    --font-heading: 'Press Start 2P', cursive;
+    --font-body: 'Space Mono', monospace;
+  }
 }
 
 @layer base {
