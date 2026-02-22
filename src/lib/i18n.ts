@@ -193,6 +193,45 @@ const translations = {
   },
   "rules.back": { pl: "Powrót", en: "Back", de: "Zurück", es: "Volver" },
 
+  // Reversi rules
+  "rules.reversiTitle": { pl: "Zasady Reversi", en: "Reversi rules", de: "Reversi-Regeln", es: "Reglas de Reversi" },
+  "rules.fiveStrikeTitle": { pl: "Zasady Five Strike", en: "Five Strike rules", de: "Five Strike-Regeln", es: "Reglas de Five Strike" },
+  "rules.reversiBoard": { pl: "Plansza", en: "Board", de: "Spielfeld", es: "Tablero" },
+  "rules.reversiBoardDesc": {
+    pl: "Gra toczy się na planszy 8×8. Na starcie 4 pionki (2 czarne, 2 białe) stoją na środku planszy.",
+    en: "The game is played on an 8×8 board. At the start, 4 discs (2 black, 2 white) are placed in the center.",
+    de: "Das Spiel wird auf einem 8×8-Brett gespielt. Zu Beginn stehen 4 Steine (2 schwarze, 2 weiße) in der Mitte.",
+    es: "El juego se juega en un tablero 8×8. Al inicio, 4 fichas (2 negras, 2 blancas) están en el centro.",
+  },
+  "rules.reversiMoves": { pl: "Wykonywanie ruchu", en: "Making a move", de: "Zug ausführen", es: "Hacer un movimiento" },
+  "rules.reversiMovesDesc": {
+    pl: "Stawiasz pionek tak, aby zamknąć w linii (poziomo, pionowo lub po skosie) co najmniej jeden pionek przeciwnika między swoim nowym a istniejącym pionkiem. Otoczone pionki zostają odwrócone na Twój kolor.",
+    en: "Place a disc so that at least one opponent disc is flanked in a line (horizontally, vertically, or diagonally) between your new disc and an existing one. Flanked discs are flipped to your color.",
+    de: "Setze einen Stein so, dass mindestens ein gegnerischer Stein in einer Linie (horizontal, vertikal oder diagonal) eingeschlossen wird. Eingeschlossene Steine werden umgedreht.",
+    es: "Coloca una ficha de modo que al menos una ficha rival quede flanqueada en línea (horizontal, vertical o diagonal). Las fichas flanqueadas se voltean a tu color.",
+  },
+  "rules.reversiPass": { pl: "Pas", en: "Pass", de: "Passen", es: "Pasar" },
+  "rules.reversiPassDesc": {
+    pl: "Jeśli nie masz żadnego legalnego ruchu, Twoja tura jest automatycznie pomijana.",
+    en: "If you have no legal moves, your turn is automatically skipped.",
+    de: "Wenn du keinen gültigen Zug hast, wird dein Zug automatisch übersprungen.",
+    es: "Si no tienes movimientos legales, tu turno se salta automáticamente.",
+  },
+  "rules.reversiGoal": { pl: "Cel gry", en: "Goal", de: "Spielziel", es: "Objetivo" },
+  "rules.reversiGoalDesc": {
+    pl: "Gra kończy się, gdy żaden gracz nie może wykonać ruchu. Wygrywa ten, kto ma więcej pionków na planszy.",
+    en: "The game ends when neither player can move. The player with more discs on the board wins.",
+    de: "Das Spiel endet, wenn kein Spieler mehr ziehen kann. Der Spieler mit mehr Steinen gewinnt.",
+    es: "El juego termina cuando ningún jugador puede mover. Gana quien tenga más fichas en el tablero.",
+  },
+  "rules.reversiStrategy": { pl: "Strategia", en: "Strategy", de: "Strategie", es: "Estrategia" },
+  "rules.reversiStrategyDesc": {
+    pl: "Narożniki są najcenniejsze — nie da się ich odwrócić. Unikaj pól obok narożników, bo ułatwiasz przeciwnikowi ich zajęcie.",
+    en: "Corners are the most valuable — they can never be flipped. Avoid squares next to corners, as they help your opponent capture them.",
+    de: "Ecken sind am wertvollsten — sie können nie umgedreht werden. Vermeide Felder neben Ecken, da sie dem Gegner helfen, sie zu besetzen.",
+    es: "Las esquinas son las más valiosas — no se pueden voltear. Evita las casillas junto a las esquinas, ya que ayudan al rival a capturarlas.",
+  },
+
   // Navigation
   "nav.menu": { pl: "Menu", en: "Menu", de: "Menü", es: "Menú" },
   "nav.back": { pl: "Powrót", en: "Back", de: "Zurück", es: "Volver" },
