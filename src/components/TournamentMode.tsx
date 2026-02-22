@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ComponentType } from "react";
 import { ArrowLeft, Plus, X, Trophy, Users, Save } from "lucide-react";
 import { Player, TournamentMatch, generateRoundRobinMatches, calculateStandings } from "@/lib/tournament";
-import { saveTournament, clearTournament, addGameToHistory } from "@/lib/storage";
+import { saveTournament, clearTournament, addGameToHistory, saveReversiTournament, clearReversiTournament } from "@/lib/storage";
 import GameBoard, { GameResult } from "./GameBoard";
 import { t, useLang } from "@/lib/i18n";
 
@@ -11,12 +11,15 @@ interface TournamentModeProps {
   resumeMatches?: TournamentMatch[];
   minPlayers?: number;
   maxPlayers?: number;
+  BoardComponent?: ComponentType<any>;
+  gameId?: "fiveStrike" | "reversi";
 }
 
 type TournamentPhase = "setup" | "bracket" | "playing";
 
-const TournamentMode = ({ onBack, resumePlayers, resumeMatches, minPlayers = 2, maxPlayers }: TournamentModeProps) => {
+const TournamentMode = ({ onBack, resumePlayers, resumeMatches, minPlayers = 2, maxPlayers, BoardComponent, gameId = "fiveStrike" }: TournamentModeProps) => {
   const [lang] = useLang();
+  const Board = BoardComponent ?? GameBoard;
   const isResuming = !!(resumePlayers && resumeMatches);
   const [phase, setPhase] = useState<TournamentPhase>(isResuming ? "bracket" : "setup");
   const [players, setPlayers] = useState<Player[]>(resumePlayers ?? []);
@@ -25,9 +28,20 @@ const TournamentMode = ({ onBack, resumePlayers, resumeMatches, minPlayers = 2, 
   const [matches, setMatches] = useState<TournamentMatch[]>(resumeMatches ?? []);
   const [currentMatch, setCurrentMatch] = useState<TournamentMatch | null>(null);
 
+  const doSave = (data: { players: Player[]; matches: TournamentMatch[] }) => {
+    const saveData = { ...data, savedAt: Date.now(), game: gameId as any };
+    if (gameId === "reversi") saveReversiTournament(saveData);
+    else saveTournament(saveData);
+  };
+
+  const doClear = () => {
+    if (gameId === "reversi") clearReversiTournament();
+    else clearTournament();
+  };
+
   useEffect(() => {
     if (phase !== "setup" && players.length > 0 && matches.length > 0) {
-      saveTournament({ players, matches, savedAt: Date.now() });
+      doSave({ players, matches });
     }
   }, [matches, players, phase]);
 
@@ -63,12 +77,13 @@ const TournamentMode = ({ onBack, resumePlayers, resumeMatches, minPlayers = 2, 
       playerX: swapPlayers ? currentMatch.playerB.name : currentMatch.playerA.name,
       playerO: swapPlayers ? currentMatch.playerA.name : currentMatch.playerB.name,
       winner: result.winner, isDraw: result.isDraw, mode: mode as "duel" | "tournament",
+      game: gameId,
     });
   };
 
   const backToBracket = () => { setCurrentMatch(null); setPhase("bracket"); };
-  const handleSaveAndExit = () => { saveTournament({ players, matches, savedAt: Date.now() }); onBack(); };
-  const handleEndTournament = () => { clearTournament(); onBack(); };
+  const handleSaveAndExit = () => { doSave({ players, matches }); onBack(); };
+  const handleEndTournament = () => { doClear(); onBack(); };
 
   if (phase === "setup") {
     const matchCount = (players.length * (players.length - 1)) / 2 * rounds;
@@ -79,6 +94,7 @@ const TournamentMode = ({ onBack, resumePlayers, resumeMatches, minPlayers = 2, 
         </button>
         <h2 className="text-2xl font-bold" style={{ color: "hsl(var(--secondary))", textShadow: "var(--neon-glow-secondary)" }}>
           {maxPlayers === 2 ? (<><Users className="w-6 h-6 inline mr-2" />{t("tournament.duelTitle")}</>) : (<><Trophy className="w-6 h-6 inline mr-2" />{t("tournament.title")}</>)}
+          {gameId === "reversi" && <span className="text-sm ml-2 opacity-70">— Reversi</span>}
         </h2>
         <p className="text-muted-foreground text-sm text-center">
           {maxPlayers === 2 ? t("tournament.duelDesc") : t("tournament.desc", { min: minPlayers })}
@@ -134,7 +150,7 @@ const TournamentMode = ({ onBack, resumePlayers, resumeMatches, minPlayers = 2, 
     const pO = swapPlayers ? currentMatch.playerA.name : currentMatch.playerB.name;
     return (
       <div className="flex flex-col items-center gap-4 w-full">
-        <GameBoard playerX={pX} playerO={pO} onGameEnd={handleGameEnd} onBack={backToBracket} onExit={backToBracket} />
+        <Board playerX={pX} playerO={pO} onGameEnd={handleGameEnd} onBack={backToBracket} onExit={backToBracket} />
       </div>
     );
   }
