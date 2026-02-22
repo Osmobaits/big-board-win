@@ -196,6 +196,29 @@ const translations = {
   // Navigation
   "nav.menu": { pl: "Menu", en: "Menu", de: "Menü", es: "Menú" },
   "nav.back": { pl: "Powrót", en: "Back", de: "Zurück", es: "Volver" },
+
+  // Reversi
+  "reversi.subtitle": {
+    pl: "Plansza 8×8 · Odwracaj pionki",
+    en: "8×8 Board · Flip the discs",
+    de: "8×8 Brett · Steine umdrehen",
+    es: "Tablero 8×8 · Voltea las fichas",
+  },
+  "reversi.playerBlack": {
+    pl: "Gracz Czarny", en: "Black player", de: "Spieler Schwarz", es: "Jugador Negro",
+  },
+  "reversi.playerWhite": {
+    pl: "Gracz Biały", en: "White player", de: "Spieler Weiß", es: "Jugador Blanco",
+  },
+  "reversi.noMoves": {
+    pl: "{name} nie ma ruchów — pas!",
+    en: "{name} has no moves — pass!",
+    de: "{name} hat keine Züge — passen!",
+    es: "¡{name} no tiene movimientos — pasa!",
+  },
+  "game.selectGame": {
+    pl: "Wybierz grę", en: "Select game", de: "Spiel wählen", es: "Seleccionar juego",
+  },
 } as const;
 
 type TranslationKey = keyof typeof translations;
