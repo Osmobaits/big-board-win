@@ -258,6 +258,22 @@ const translations = {
   "game.selectGame": {
     pl: "Wybierz grę", en: "Select game", de: "Spiel wählen", es: "Seleccionar juego",
   },
+
+  // Galaga
+  "galaga.score": { pl: "Wynik", en: "Score", de: "Punkte", es: "Puntos" },
+  "galaga.controls": {
+    pl: "Dotknij ekranu lub użyj strzałek + spacji",
+    en: "Touch the screen or use arrow keys + space",
+    de: "Bildschirm berühren oder Pfeiltasten + Leertaste",
+    es: "Toca la pantalla o usa las flechas + espacio",
+  },
+  "galaga.start": { pl: "Start", en: "Start", de: "Start", es: "Inicio" },
+  "galaga.retry": { pl: "Jeszcze raz", en: "Retry", de: "Nochmal", es: "Reintentar" },
+  "galaga.levelComplete": { pl: "Poziom ukończony!", en: "Level complete!", de: "Level geschafft!", es: "¡Nivel completado!" },
+  "galaga.nextLevel": { pl: "Następny poziom", en: "Next level", de: "Nächstes Level", es: "Siguiente nivel" },
+  "galaga.moveKeys": { pl: "ruch", en: "move", de: "bewegen", es: "mover" },
+  "galaga.shootKey": { pl: "strzał", en: "shoot", de: "schießen", es: "disparar" },
+  "menu.galaga": { pl: "Galaga", en: "Galaga", de: "Galaga", es: "Galaga" },
 } as const;
 
 type TranslationKey = keyof typeof translations;
