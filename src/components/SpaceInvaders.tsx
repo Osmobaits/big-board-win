@@ -24,9 +24,9 @@ const ENEMY_COLS = 8;
 const ENEMY_ROWS = 4;
 const ENEMY_GAP_X = 38;
 const ENEMY_GAP_Y = 32;
-const PLAYER_SPEED = 5;
+const PLAYER_SPEED = 3;
 const BULLET_SPEED = 7;
-const ENEMY_BULLET_SPEED = 3;
+const ENEMY_BULLET_SPEED = 1.8;
 const SHOOT_COOLDOWN = 250;
 
 interface Entity { x: number; y: number; w: number; h: number; alive?: boolean }
@@ -95,7 +95,7 @@ const SpaceInvaders = ({ onBack }: SpaceInvadersProps) => {
     s.enemyBullets = [];
     s.enemies = createEnemies(1);
     s.enemyDir = 1;
-    s.enemySpeed = 0.5;
+    s.enemySpeed = 0.3;
     s.enemyMoveTimer = 0;
     s.score = 0;
     s.level = 1;
@@ -115,7 +115,7 @@ const SpaceInvaders = ({ onBack }: SpaceInvadersProps) => {
     s.enemyBullets = [];
     s.enemies = createEnemies(s.level);
     s.enemyDir = 1;
-    s.enemySpeed = 0.5 + s.level * 0.15;
+    s.enemySpeed = 0.3 + s.level * 0.1;
     s.enemyMoveTimer = 0;
     s.gameState = "playing";
     setLevel(s.level);
@@ -268,7 +268,7 @@ const SpaceInvaders = ({ onBack }: SpaceInvadersProps) => {
 
       // Enemy shooting
       const aliveEnemies = s.enemies.filter(e => e.alive);
-      if (aliveEnemies.length > 0 && Math.random() < 0.02 + s.level * 0.005) {
+      if (aliveEnemies.length > 0 && Math.random() < 0.008 + s.level * 0.003) {
         const shooter = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
         s.enemyBullets.push({ x: shooter.x + ENEMY_W / 2, y: shooter.y + ENEMY_H, w: ENEMY_BULLET_W, h: ENEMY_BULLET_H });
       }
