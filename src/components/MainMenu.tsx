@@ -21,12 +21,13 @@ interface MainMenuProps {
   onResumeReversiTournament: () => void;
   onHistory: () => void;
   onRules: () => void;
+  onGalaga: () => void;
 }
 
 const MainMenu = ({
   onSingleGame, onDuel, onTournament, onResumeSingle, onResumeTournament,
   onReversiSingle, onReversiDuel, onReversiTournament, onResumeReversiSingle, onResumeReversiTournament,
-  onHistory, onRules,
+  onHistory, onRules, onGalaga,
 }: MainMenuProps) => {
   const [hasSingle, setHasSingle] = useState(hasSavedSingleGame());
   const [hasTournament, setHasTournament] = useState(hasSavedTournament());
@@ -115,6 +116,20 @@ const MainMenu = ({
           ⚫⚪ Reversi
         </button>
       </div>
+
+      {/* Galaga button */}
+      <motion.button onClick={onGalaga} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
+        className="w-full py-3 rounded-lg font-bold text-xs uppercase tracking-wider transition-all"
+        style={{
+          fontFamily: theme.headingFont,
+          fontSize: themeId === "arcade" ? "0.55rem" : "0.7rem",
+          backgroundColor: "hsl(var(--accent) / 0.1)",
+          border: "2px solid hsl(var(--accent) / 0.4)",
+          color: "hsl(var(--accent))",
+          textShadow: "var(--neon-glow-accent)",
+        }}>
+        🚀 Galaga
+      </motion.button>
 
       {/* Title */}
       <AnimatePresence mode="wait">
