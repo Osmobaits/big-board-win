@@ -4,7 +4,6 @@ import MainMenu from "@/components/MainMenu";
 import SingleGame from "@/components/SingleGame";
 import ReversiSingleGame from "@/components/ReversiSingleGame";
 import TournamentMode from "@/components/TournamentMode";
-import SpaceInvaders from "@/components/SpaceInvaders";
 import GameRules from "@/components/GameRules";
 import GameHistory from "@/components/GameHistory";
 import ReversiBoard from "@/components/ReversiBoard";
@@ -15,7 +14,6 @@ type Screen =
   | "menu"
   | "single" | "single-resume" | "duel" | "tournament" | "tournament-resume"
   | "reversi-single" | "reversi-single-resume" | "reversi-duel" | "reversi-tournament" | "reversi-tournament-resume"
-  | "galaga"
   | "history" | "rules";
 
 const screenVariants = {
@@ -64,7 +62,6 @@ const Index = () => {
                 onResumeReversiTournament={() => setScreen("reversi-tournament-resume")}
                 onHistory={() => setScreen("history")}
                 onRules={() => setScreen("rules")}
-                onGalaga={() => setScreen("galaga")}
               />
             </MotionWrap>
           )}
@@ -110,13 +107,6 @@ const Index = () => {
           {screen === "reversi-tournament-resume" && savedReversiTournament && (
             <MotionWrap screenKey="reversi-tournament-resume">
               <TournamentMode onBack={() => setScreen("menu")} resumePlayers={savedReversiTournament.players} resumeMatches={savedReversiTournament.matches} BoardComponent={ReversiBoard} gameId="reversi" />
-            </MotionWrap>
-          )}
-
-          {/* Galaga */}
-          {screen === "galaga" && (
-            <MotionWrap screenKey="galaga">
-              <SpaceInvaders onBack={() => setScreen("menu")} />
             </MotionWrap>
           )}
 
